@@ -142,7 +142,8 @@ public class Racing extends JPanel implements ActionListener {
 		} else {
 			if (raceCar.getSpeed() >= Car.SLOW_SPEED) {
 				raceCar.setSlowSpeed();
-			} else if (raceCar.getSpeed() < 0) {
+			}
+			if (raceCar.getSpeed() < 0) {
 				raceCar.setMinSlowSpeed();
 			}
 		}
@@ -172,7 +173,7 @@ public class Racing extends JPanel implements ActionListener {
 			if (raceCar.getSpeed() >= 0) {
 				raceCar.slowdown(0.4);
 			} else {
-				raceCar.accelerate();
+				raceCar.slowdownBackward(0.4);
 			}
 		}
 	}

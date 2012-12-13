@@ -83,6 +83,12 @@ public class Car extends JComponent {
 		}
 	}
 
+	public void deccelerate() {
+		if (speed >= MAX_BACKWARD_SPEED) {
+			speed -= 0.1;
+		}
+	}
+
 	public void slowdown() {
 		slowdown(1);
 	}
@@ -94,10 +100,24 @@ public class Car extends JComponent {
 		}
 	}
 
+	public void slowdownBackward(final double factor) {
+		speed += 0.2 * factor;
+		if (speed > 0) {
+			speed = 0;
+		}
+	}
+
 	public void setSlowSpeed() {
-		if (speed != SLOW_SPEED) {
+		if (speed > SLOW_SPEED) {
 			slowdown(2.8);
 		}
+	}
+
+	public void setMinSlowSpeed() {
+		if (speed < -SLOW_SPEED) {
+			speed = -SLOW_SPEED;
+		}
+
 	}
 
 	public void stop() {
@@ -142,17 +162,6 @@ public class Car extends JComponent {
 		f.add(c);
 		f.setSize(200, 240);
 		f.setVisible(true);
-
-	}
-
-	public void deccelerate() {
-		if (speed >= MAX_BACKWARD_SPEED) {
-			speed -= 0.1;
-		}
-	}
-
-	public void setMinSlowSpeed() {
-		speed = -SLOW_SPEED;
 
 	}
 
