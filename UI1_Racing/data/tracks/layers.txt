@@ -1,0 +1,7 @@
+- track:
+	sand: 0xbdbdbd
+	surface: 0x000000
+- checkpt:
+	check point: 0xffff00
+- wall:
+	wall: 0xff0000
