@@ -29,6 +29,8 @@ public class Racing extends JPanel implements ActionListener {
 	private Timer timer;
 	private BufferedImage track;
 	private BufferedImage texture;
+	private BufferedImage checkpt;
+	private BufferedImage wall;
 
 	public Racing() {
 		init();
@@ -36,17 +38,21 @@ public class Racing extends JPanel implements ActionListener {
 
 	private void init() {
 		try {
-			track = ImageIO.read(new File("data/Racing01.png"));
-			texture = ImageIO.read(new File("data/Grass.jpg"));
+			track = ImageIO.read(new File("data/tracks/silverstone/track.png"));
+			texture = ImageIO.read(new File(
+					"data/tracks/silverstone/texture.png"));
+			checkpt = ImageIO.read(new File(
+					"data/tracks/silverstone/checkpt.png"));
+			wall = ImageIO.read(new File("data/tracks/silverstone/wall.png"));
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 
-		screenSize = new Dimension(600, 600);
+		screenSize = new Dimension(1680, 1000);
 		setPreferredSize(screenSize);
 
 		raceCar = new Car();
-		raceCar.move(300, 300);
+		raceCar.move(1370, 390);
 
 		registerKeyListener();
 
@@ -83,11 +89,10 @@ public class Racing extends JPanel implements ActionListener {
 	public void paintComponent(final Graphics g) {
 		super.paintComponent(g);
 		final Graphics2D g2d = (Graphics2D) g;
-		g2d.drawImage(texture, 0, 0, null);
-		g2d.drawImage(texture, 0, 512, null);
-		g2d.drawImage(texture, 512, 0, null);
-		g2d.drawImage(texture, 512, 512, null);
+		g2d.drawImage(wall, 0, 0, null);
+		g2d.drawImage(checkpt, 0, 0, null);
 		g2d.drawImage(track, 0, 0, null);
+		g2d.drawImage(texture, 0, 0, null);
 		raceCar.paintComponent(g2d);
 	}
 
@@ -125,27 +130,47 @@ public class Racing extends JPanel implements ActionListener {
 			return false;
 		}
 
+		final int carMiddleX = raceCar.getX();
+		final int carMiddleY = raceCar.getY();
+		/*
+		 * Überprüfen ob das Fahrzeug einen Checkpoint passiert hat
+		 */
+
+		final int checkPointColor = checkpt.getRGB(carMiddleX, carMiddleY);
+		if (new Color(checkPointColor).equals(new Color(0xffff00))) {
+			// TODO Checkpoint verification
+		}
+
 		/*
 		 * �berpr�fen ob sich das Fahrzueg noch auf der Strecke befindet
 		 */
-		final int carMiddleX = raceCar.getX();
-		final int carMiddleY = raceCar.getY();
 
-		final int trackColor = track.getRGB(carMiddleX, carMiddleY);
-		if (new Color(trackColor).equals(Color.black)) {
-			return true;
-		}
-		if (new Color(trackColor).equals(new Color(0xBDBDBD))) {
-			if (raceCar.getSpeed() >= Car.SLOW_SPEED) {
-				raceCar.slowdown();
-			}
-		} else {
+		int trackColor = track.getRGB(carMiddleX, carMiddleY);
+		if (trackColor == 0) {
 			if (raceCar.getSpeed() >= Car.SLOW_SPEED) {
 				raceCar.setSlowSpeed();
 			}
 			if (raceCar.getSpeed() < 0) {
 				raceCar.setMinSlowSpeed();
 			}
+		} else {
+			if (new Color(trackColor).equals(Color.black)) {
+				return true;
+			}
+			if (new Color(trackColor).equals(new Color(0xBDBDBD))) {
+				if (raceCar.getSpeed() >= Car.SLOW_SPEED) {
+					raceCar.slowdown();
+					return true;
+				}
+			}
+
+		}
+		trackColor = wall.getRGB(carMiddleX, carMiddleY);
+		if (new Color(trackColor).equals(new Color(0xff0000))) {
+			raceCar.stop();
+			trackColor = wall.getRGB(raceCar.getOldX(), raceCar.getOldY());
+			raceCar.move(raceCar.getOldX(), raceCar.getOldY());
+			return false;
 		}
 		return true;
 	}
@@ -197,7 +222,7 @@ public class Racing extends JPanel implements ActionListener {
 		final JFrame f = new JFrame("Racing");
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.add(new Racing());
-		f.setResizable(false);
+		// f.setResizable(false);
 		f.pack();
 		f.setVisible(true);
 	}

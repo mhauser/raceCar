@@ -14,7 +14,7 @@ public class Car extends JComponent {
 	public static final double SLOW_SPEED = 1;
 	public static final double MAX_FORWARD_SPEED = 6;
 	public static final double MAX_BACKWARD_SPEED = -2;
-	private double x = 0, y = 0;
+	private double x = 0, y = 0, oldX = 0, oldY = 0;
 	private float angle = 0;
 	private double speed = 0.0;
 
@@ -28,6 +28,8 @@ public class Car extends JComponent {
 	}
 
 	public void move(final double x, final double y) {
+		oldX = this.x;
+		oldY = this.y;
 		this.x = x;
 		this.y = y;
 	}
@@ -142,6 +144,14 @@ public class Car extends JComponent {
 		return doubleToInt(y);
 	}
 
+	public int getOldY() {
+		return doubleToInt(oldY);
+	}
+
+	public int getOldX() {
+		return doubleToInt(oldX);
+	}
+
 	public float getAngle() {
 		return angle;
 	}
@@ -161,6 +171,7 @@ public class Car extends JComponent {
 		c.move(50, 50);
 		f.add(c);
 		f.setSize(200, 240);
+		f.setResizable(false);
 		f.setVisible(true);
 
 	}
