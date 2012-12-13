@@ -145,7 +145,14 @@ public class Racing extends JPanel implements ActionListener {
 		 * �berpr�fen ob sich das Fahrzueg noch auf der Strecke befindet
 		 */
 
-		int trackColor = track.getRGB(carMiddleX, carMiddleY);
+		int trackColor = wall.getRGB(carMiddleX, carMiddleY);
+		if (new Color(trackColor).equals(new Color(0xff0000))) {
+			raceCar.stop();
+			trackColor = wall.getRGB(raceCar.getOldX(), raceCar.getOldY());
+			raceCar.move(raceCar.getOldX(), raceCar.getOldY());
+			return false;
+		}
+		trackColor = track.getRGB(carMiddleX, carMiddleY);
 		if (trackColor == 0) {
 			if (raceCar.getSpeed() >= Car.SLOW_SPEED) {
 				raceCar.setSlowSpeed();
@@ -164,13 +171,6 @@ public class Racing extends JPanel implements ActionListener {
 				}
 			}
 
-		}
-		trackColor = wall.getRGB(carMiddleX, carMiddleY);
-		if (new Color(trackColor).equals(new Color(0xff0000))) {
-			raceCar.stop();
-			trackColor = wall.getRGB(raceCar.getOldX(), raceCar.getOldY());
-			raceCar.move(raceCar.getOldX(), raceCar.getOldY());
-			return false;
 		}
 		return true;
 	}
