@@ -32,12 +32,9 @@ public class Racing extends JPanel implements ActionListener {
 	private BufferedImage texture;
 	private BufferedImage checkpt;
 	private BufferedImage wall;
+	private BufferedImage grass;
 
 	public Racing() {
-		init();
-	}
-
-	private void init() {
 		try {
 			track = ImageIO.read(new File("data/tracks/silverstone/track.png"));
 			texture = ImageIO.read(new File(
@@ -45,9 +42,14 @@ public class Racing extends JPanel implements ActionListener {
 			checkpt = ImageIO.read(new File(
 					"data/tracks/silverstone/checkpt.png"));
 			wall = ImageIO.read(new File("data/tracks/silverstone/wall.png"));
+			grass = ImageIO.read(new File("data/tracks/silverstone/grass.png"));
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
+		init();
+	}
+
+	private void init() {
 
 		screenSize = new Dimension(1680, 1000);
 		setPreferredSize(screenSize);
@@ -91,6 +93,7 @@ public class Racing extends JPanel implements ActionListener {
 	public void paintComponent(final Graphics g) {
 		super.paintComponent(g);
 		final Graphics2D g2d = (Graphics2D) g;
+		g2d.drawImage(grass, 0, 0, null);
 		g2d.drawImage(wall, 0, 0, null);
 		g2d.drawImage(checkpt, 0, 0, null);
 		g2d.drawImage(track, 0, 0, null);
