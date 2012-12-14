@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -52,7 +53,8 @@ public class Racing extends JPanel implements ActionListener {
 		setPreferredSize(screenSize);
 
 		raceCar = new Car();
-		raceCar.move(1370, 390);
+		raceCar.move(1370, 400);
+		raceCar.setAngle(250.31415f);
 
 		registerKeyListener();
 
@@ -93,6 +95,8 @@ public class Racing extends JPanel implements ActionListener {
 		g2d.drawImage(checkpt, 0, 0, null);
 		g2d.drawImage(track, 0, 0, null);
 		g2d.drawImage(texture, 0, 0, null);
+		g2d.drawString("LAP:", 1610, 15);
+		g2d.drawString("x / 4", 1640, 15);
 		raceCar.paintComponent(g2d);
 	}
 
@@ -108,26 +112,31 @@ public class Racing extends JPanel implements ActionListener {
 		 * �berpr�fen Sie ob das Fahrzeug den sichtbaren Bereich des Bildschirm
 		 * nicht verl�sst
 		 */
+		final List<Dimension> collisionModel = raceCar.getCollisionModel();
 		final Dimension dim = getSize();
-		if (raceCar.getX() <= 0) {
-			raceCar.move(raceCar.getX() + 1, raceCar.getY());
-			raceCar.stop();
-			return false;
-		}
-		if (raceCar.getX() >= dim.width) {
-			raceCar.move(raceCar.getX() - 1, raceCar.getY());
-			raceCar.stop();
-			return false;
-		}
-		if (raceCar.getY() <= 0) {
-			raceCar.move(raceCar.getX(), raceCar.getY() + 1);
-			raceCar.stop();
-			return false;
-		}
-		if (raceCar.getY() >= dim.height) {
-			raceCar.move(raceCar.getX(), raceCar.getY() - 1);
-			raceCar.stop();
-			return false;
+		for (final Dimension collDimension : collisionModel) {
+			final int x = collDimension.width;
+			final int y = collDimension.height;
+			if (x <= 0) {
+				raceCar.move(raceCar.getX() + 1, raceCar.getY());
+				raceCar.stop();
+				return false;
+			}
+			if (x >= dim.width) {
+				raceCar.move(raceCar.getX() - 1, raceCar.getY());
+				raceCar.stop();
+				return false;
+			}
+			if (y <= 0) {
+				raceCar.move(raceCar.getX(), raceCar.getY() + 1);
+				raceCar.stop();
+				return false;
+			}
+			if (y >= dim.height) {
+				raceCar.move(raceCar.getX(), raceCar.getY() - 1);
+				raceCar.stop();
+				return false;
+			}
 		}
 
 		final int carMiddleX = raceCar.getX();
@@ -144,13 +153,16 @@ public class Racing extends JPanel implements ActionListener {
 		/*
 		 * �berpr�fen ob sich das Fahrzueg noch auf der Strecke befindet
 		 */
-
-		int trackColor = wall.getRGB(carMiddleX, carMiddleY);
-		if (new Color(trackColor).equals(new Color(0xff0000))) {
-			raceCar.stop();
-			trackColor = wall.getRGB(raceCar.getOldX(), raceCar.getOldY());
-			raceCar.move(raceCar.getOldX(), raceCar.getOldY());
-			return false;
+		int trackColor = 0;
+		for (final Dimension collDimension : collisionModel) {
+			final int x = collDimension.width;
+			final int y = collDimension.height;
+			trackColor = wall.getRGB(x, y);
+			if (new Color(trackColor).equals(new Color(0xff0000))) {
+				raceCar.stop();
+				raceCar.move(raceCar.getOldX(), raceCar.getOldY());
+				return false;
+			}
 		}
 		trackColor = track.getRGB(carMiddleX, carMiddleY);
 		if (trackColor == 0) {
@@ -222,7 +234,7 @@ public class Racing extends JPanel implements ActionListener {
 		final JFrame f = new JFrame("Racing");
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.add(new Racing());
-		// f.setResizable(false);
+		f.setResizable(false);
 		f.pack();
 		f.setVisible(true);
 	}

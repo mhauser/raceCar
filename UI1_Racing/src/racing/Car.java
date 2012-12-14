@@ -1,9 +1,12 @@
 package racing;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -162,6 +165,21 @@ public class Car extends JComponent {
 
 	public void setAngle(final float angle) {
 		this.angle = angle;
+	}
+
+	public List<Dimension> getCollisionModel() {
+		final List<Dimension> collisionModel = new ArrayList<>();
+		collisionModel.add(new Dimension(doubleToInt(x - 18),
+				doubleToInt(y + 18)));
+		collisionModel.add(new Dimension(doubleToInt(x + 18),
+				doubleToInt(y + 18)));
+		collisionModel.add(new Dimension(doubleToInt(x - 18),
+				doubleToInt(y - 18)));
+		collisionModel.add(new Dimension(doubleToInt(x + 18),
+				doubleToInt(y - 18)));
+		collisionModel.add(new Dimension(doubleToInt(x), doubleToInt(y + 18)));
+		collisionModel.add(new Dimension(doubleToInt(x), doubleToInt(y - 18)));
+		return collisionModel;
 	}
 
 	public static void main(final String[] args) {
