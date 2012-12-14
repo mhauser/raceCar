@@ -209,7 +209,7 @@ public class Car extends JComponent {
 
 	public void bumpBack() {
 		if (speed >= 0) {
-			speed = -10;
+			speed = -3;
 		} else {
 			speed = 3;
 		}
