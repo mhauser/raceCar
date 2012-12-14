@@ -176,6 +176,9 @@ public class Car extends JComponent {
 		collisionModel.add(calculateMatrix(x + 20, y - 20));
 		collisionModel.add(calculateMatrix(x, y + 20));
 		collisionModel.add(calculateMatrix(x, y - 20));
+		collisionModel.add(calculateMatrix(x + 20, y));
+		collisionModel.add(calculateMatrix(x - 20, y));
+		collisionModel.add(calculateMatrix(x, y));
 		return collisionModel;
 	}
 
@@ -201,6 +204,15 @@ public class Car extends JComponent {
 		f.setSize(200, 240);
 		f.setResizable(false);
 		f.setVisible(true);
+
+	}
+
+	public void bumpBack() {
+		if (speed >= 0) {
+			speed = -10;
+		} else {
+			speed = 3;
+		}
 
 	}
 

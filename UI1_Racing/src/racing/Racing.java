@@ -159,8 +159,8 @@ public class Racing extends JPanel implements ActionListener {
 			final int y = collDimension.height;
 			trackColor = wall.getRGB(x, y);
 			if (new Color(trackColor).equals(new Color(0xff0000))) {
-				raceCar.stop();
 				raceCar.move(raceCar.getOldX(), raceCar.getOldY());
+				raceCar.bumpBack();
 				return false;
 			}
 		}
