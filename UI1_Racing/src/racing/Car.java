@@ -169,17 +169,27 @@ public class Car extends JComponent {
 
 	public List<Dimension> getCollisionModel() {
 		final List<Dimension> collisionModel = new ArrayList<>();
-		collisionModel.add(new Dimension(doubleToInt(x - 18),
-				doubleToInt(y + 18)));
-		collisionModel.add(new Dimension(doubleToInt(x + 18),
-				doubleToInt(y + 18)));
-		collisionModel.add(new Dimension(doubleToInt(x - 18),
-				doubleToInt(y - 18)));
-		collisionModel.add(new Dimension(doubleToInt(x + 18),
-				doubleToInt(y - 18)));
-		collisionModel.add(new Dimension(doubleToInt(x), doubleToInt(y + 18)));
-		collisionModel.add(new Dimension(doubleToInt(x), doubleToInt(y - 18)));
+
+		collisionModel.add(calculateMatrix(x - 20, y + 20));
+		collisionModel.add(calculateMatrix(x + 20, y + 20));
+		collisionModel.add(calculateMatrix(x - 20, y - 20));
+		collisionModel.add(calculateMatrix(x + 20, y - 20));
+		collisionModel.add(calculateMatrix(x, y + 20));
+		collisionModel.add(calculateMatrix(x, y - 20));
 		return collisionModel;
+	}
+
+	private Dimension calculateMatrix(double absoluteX, double absoluteY) {
+		absoluteX -= x;
+		absoluteY -= y;
+		final double rotatedX = (Math.cos(angle) * absoluteX)
+				- (absoluteY * Math.sin(angle));
+		final double rotatedY = (Math.sin(angle) * absoluteX)
+				+ (absoluteY * Math.cos(angle));
+		final Dimension d = new Dimension();
+		d.setSize(rotatedX + x, rotatedY + y);
+
+		return d;
 	}
 
 	public static void main(final String[] args) {
