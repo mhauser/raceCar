@@ -54,7 +54,7 @@ public class Racing extends JPanel implements ActionListener {
 
 		raceCar = new Car();
 		raceCar.move(1370, 400);
-		raceCar.setAngle(250.31415f);
+		// raceCar.setAngle((float) (0.838734 * 2 * Math.PI));
 
 		registerKeyListener();
 
