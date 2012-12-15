@@ -13,7 +13,10 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -32,10 +35,15 @@ public class Racing extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1169331112688629681L;
 
 	private final String racingTrack = "silverstone";
+	private final DateFormat df = new SimpleDateFormat("mm:ss:SSS");
+	private final int lapsToDrive = 4;
+	private final long[] lapTimes = new long[lapsToDrive];
+
+	private long lapStartTime = 0;
+	private long lapTime = 0;
 	private int checkpointsCount;
-	private boolean[] checkpoints;
 	private int[] keys;
-	private int lapCount = -1;
+	private int lapCount = 0;
 	private int nextCheckpoint = 0;
 	private Car raceCar;
 	private Dimension screenSize;
@@ -82,6 +90,8 @@ public class Racing extends JPanel implements ActionListener {
 		loadCheckPoints();
 		registerKeyListener();
 
+		Arrays.fill(lapTimes, 0);
+
 		timer = new Timer(15, this);
 		timer.start();
 	}
@@ -117,9 +127,6 @@ public class Racing extends JPanel implements ActionListener {
 		final String[] chps = checkPointDirectory.list();
 		checkpointsCount = chps.length;
 
-		checkpoints = new boolean[checkpointsCount];
-		Arrays.fill(checkpoints, false);
-
 		checkpt = new BufferedImage[checkpointsCount];
 		for (int i = 0; i < checkpointsCount; i++) {
 			try {
@@ -143,7 +150,16 @@ public class Racing extends JPanel implements ActionListener {
 		g2d.drawImage(checkpt[nextCheckpoint], 0, 0, null);
 
 		g2d.setFont(new Font("Arial", Font.BOLD, 26));
-		g2d.drawString("LAP:  " + lapCount + "/ 4", 1540, 35);
+		g2d.drawString("LAP:  " + lapCount + "/ " + lapsToDrive, 1540, 35);
+		g2d.setFont(new Font("Arial", Font.BOLD, 12));
+		for (int i = 0; i < lapTimes.length; i++) {
+			final long lapT = lapTimes[i];
+			if (lapT != 0) {
+				g2d.drawString(
+						"LAP " + (i + 1) + ":  " + df.format(new Date(lapT)),
+						1540, 35 + (i + 1) * 16);
+			}
+		}
 		raceCar.paintComponent(g2d);
 	}
 
@@ -206,6 +222,10 @@ public class Racing extends JPanel implements ActionListener {
 			playSound();
 			if (nextCheckpoint == 0) {
 				lapCount++;
+				if (lapCount != 1) {
+					lapTimes[lapCount - 2] = lapTime;
+				}
+				lapStartTime = System.currentTimeMillis();
 			}
 			nextCheckpoint = (nextCheckpoint + 1) % checkpointsCount;
 		}
@@ -277,6 +297,7 @@ public class Racing extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
+		lapTime = System.currentTimeMillis() - lapStartTime;
 		repaint();
 		moveCar();
 	}
