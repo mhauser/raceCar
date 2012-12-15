@@ -34,7 +34,7 @@ public class RacingCar extends Car {
 
 	@Override
 	public List<Dimension> getCollisionModel() {
-		final List<Dimension> collisionModel = new ArrayList<>();
+		final List<Dimension> collisionModel = new ArrayList<Dimension>();
 
 		collisionModel.add(calculateMatrix(x - 20, y + 20));
 		collisionModel.add(calculateMatrix(x + 20, y + 20));

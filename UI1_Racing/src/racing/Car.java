@@ -63,6 +63,10 @@ public abstract class Car extends JComponent {
 		slowdown(1);
 	}
 
+	public void activateBreaks() {
+		slowdown(2);
+	}
+
 	public void slowdown(final double factor) {
 		speed -= 0.2 * factor;
 		if (speed < 0) {

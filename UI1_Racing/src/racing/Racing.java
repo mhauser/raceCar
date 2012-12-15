@@ -1,5 +1,6 @@
 package racing;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -39,6 +40,9 @@ public class Racing extends JPanel implements ActionListener {
 	private final int lapsToDrive = 4;
 	private final long[] lapTimes = new long[lapsToDrive];
 
+	private final AlphaComposite transparent;
+	private final AlphaComposite nonTransparent;
+
 	private long lapStartTime = 0;
 	private long lapTime = 0;
 	private int checkpointsCount;
@@ -71,10 +75,19 @@ public class Racing extends JPanel implements ActionListener {
 					"data/cpChecked.wav"));
 			cpChecked = AudioSystem.getClip();
 			cpChecked.open(audioIn);
-		} catch (final IOException | UnsupportedAudioFileException
-				| LineUnavailableException e) {
+		} catch (final IOException e) {
+			e.printStackTrace();
+		} catch (final UnsupportedAudioFileException e) {
+			e.printStackTrace();
+		} catch (final LineUnavailableException e) {
 			e.printStackTrace();
 		}
+
+		final float alpha = 0.55f;
+		final int type = AlphaComposite.SRC_OVER;
+		transparent = AlphaComposite.getInstance(type, alpha);
+		nonTransparent = AlphaComposite.getInstance(type, 1);
+
 		init();
 	}
 
@@ -147,17 +160,21 @@ public class Racing extends JPanel implements ActionListener {
 		g2d.drawImage(wall, 0, 0, null);
 		g2d.drawImage(track, 0, 0, null);
 		g2d.drawImage(texture, 0, 0, null);
-		g2d.drawImage(checkpt[nextCheckpoint], 0, 0, null);
 
+		g2d.setComposite(transparent);
+		g2d.drawImage(checkpt[nextCheckpoint], 0, 0, null);
+		g2d.setComposite(nonTransparent);
+
+		g2d.setPaint(Color.black);
 		g2d.setFont(new Font("Arial", Font.BOLD, 26));
-		g2d.drawString("LAP:  " + lapCount + "/ " + lapsToDrive, 1540, 35);
-		g2d.setFont(new Font("Arial", Font.BOLD, 12));
+		g2d.drawString("LAP:  " + lapCount + "/ " + lapsToDrive, 1520, 35);
+		g2d.setFont(new Font("Arial", Font.BOLD, 18));
 		for (int i = 0; i < lapTimes.length; i++) {
 			final long lapT = lapTimes[i];
 			if (lapT != 0) {
 				g2d.drawString(
 						"LAP " + (i + 1) + ":  " + df.format(new Date(lapT)),
-						1540, 35 + (i + 1) * 16);
+						1520, 35 + (i + 1) * 20);
 			}
 		}
 		raceCar.paintComponent(g2d);
@@ -274,7 +291,7 @@ public class Racing extends JPanel implements ActionListener {
 		}
 		if (keys[KeyEvent.VK_DOWN] == 1) {
 			if (raceCar.getSpeed() > 0) {
-				raceCar.slowdown();
+				raceCar.activateBreaks();
 			} else {
 				raceCar.deccelerate();
 			}
