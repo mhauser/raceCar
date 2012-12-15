@@ -35,7 +35,7 @@ public class Racing extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1169331112688629681L;
 
-	private final String racingTrack = "silverstone";
+	private final String racingTrack = "monaco";
 	private final DateFormat df = new SimpleDateFormat("mm:ss:SSS");
 	private final int lapsToDrive = 4;
 	private final long[] lapTimes = new long[lapsToDrive];
