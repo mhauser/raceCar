@@ -2,6 +2,7 @@ package racing;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.KeyEventDispatcher;
@@ -29,13 +30,19 @@ import javax.swing.Timer;
 public class Racing extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1169331112688629681L;
-	private Car raceCar;
+
+	private final String racingTrack = "silverstone";
+	private int checkpointsCount;
+	private boolean[] checkpoints;
 	private int[] keys;
+	private int lapCount = -1;
+	private boolean init = false;
+	private Car raceCar;
 	private Dimension screenSize;
 	private Timer timer;
 	private BufferedImage track;
 	private BufferedImage texture;
-	private BufferedImage checkpt;
+	private BufferedImage[] checkpt;
 	private BufferedImage wall;
 	private BufferedImage grass;
 	private Clip cpChecked;
@@ -43,13 +50,14 @@ public class Racing extends JPanel implements ActionListener {
 
 	public Racing() {
 		try {
-			track = ImageIO.read(new File("data/tracks/silverstone/track.png"));
-			texture = ImageIO.read(new File(
-					"data/tracks/silverstone/texture.png"));
-			checkpt = ImageIO.read(new File(
-					"data/tracks/silverstone/checkpt.png"));
-			wall = ImageIO.read(new File("data/tracks/silverstone/wall.png"));
-			grass = ImageIO.read(new File("data/tracks/silverstone/grass.png"));
+			track = ImageIO.read(new File("data/tracks/" + racingTrack
+					+ "/track.png"));
+			texture = ImageIO.read(new File("data/tracks/" + racingTrack
+					+ "/texture.png"));
+			wall = ImageIO.read(new File("data/tracks/" + racingTrack
+					+ "/wall.png"));
+			grass = ImageIO.read(new File("data/tracks/" + racingTrack
+					+ "/grass.png"));
 
 			audioIn = AudioSystem.getAudioInputStream(new File(
 					"data/cpChecked.wav"));
@@ -62,14 +70,6 @@ public class Racing extends JPanel implements ActionListener {
 		init();
 	}
 
-	private void playSound() {
-		if (cpChecked.isRunning()) {
-			cpChecked.stop();
-		}
-		cpChecked.setFramePosition(0);
-		cpChecked.loop(0);
-	}
-
 	private void init() {
 
 		screenSize = new Dimension(1680, 1000);
@@ -79,6 +79,7 @@ public class Racing extends JPanel implements ActionListener {
 		raceCar.move(1370, 400);
 		raceCar.setAngle((float) (0.838734 * 2 * Math.PI));
 
+		loadCheckPoints();
 		registerKeyListener();
 
 		timer = new Timer(15, this);
@@ -110,17 +111,43 @@ public class Racing extends JPanel implements ActionListener {
 
 	}
 
+	private void loadCheckPoints() {
+		final File checkPointDirectory = new File("data/tracks/" + racingTrack
+				+ "/checkpoints");
+		final File[] chps = checkPointDirectory.listFiles();
+		checkpointsCount = chps.length;
+
+		checkpoints = new boolean[checkpointsCount];
+		Arrays.fill(checkpoints, false);
+
+		checkpt = new BufferedImage[checkpointsCount];
+		for (int i = 0; i < checkpointsCount; i++) {
+			try {
+				checkpt[i] = ImageIO.read(chps[i]);
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	@Override
 	public void paintComponent(final Graphics g) {
-		super.paintComponent(g);
 		final Graphics2D g2d = (Graphics2D) g;
+		super.paintComponent(g);
+		if (!init) {
+			for (final BufferedImage chpt : checkpt) {
+				g2d.drawImage(chpt, 0, 0, null);
+			}
+			init = true;
+		}
+
 		g2d.drawImage(grass, 0, 0, null);
 		g2d.drawImage(wall, 0, 0, null);
-		g2d.drawImage(checkpt, 0, 0, null);
 		g2d.drawImage(track, 0, 0, null);
 		g2d.drawImage(texture, 0, 0, null);
-		g2d.drawString("LAP:", 1610, 15);
-		g2d.drawString("x / 4", 1640, 15);
+
+		g2d.setFont(new Font("Arial", Font.BOLD, 26));
+		g2d.drawString("LAP:  " + lapCount + "/ 4", 1540, 35);
 		raceCar.paintComponent(g2d);
 	}
 
@@ -129,6 +156,14 @@ public class Racing extends JPanel implements ActionListener {
 		if (controlRaceCarPosition()) {
 			raceCar.move();
 		}
+	}
+
+	private void playSound() {
+		if (cpChecked.isRunning()) {
+			cpChecked.stop();
+		}
+		cpChecked.setFramePosition(0);
+		cpChecked.loop(0);
 	}
 
 	private boolean controlRaceCarPosition() {
@@ -169,9 +204,10 @@ public class Racing extends JPanel implements ActionListener {
 		 * Überprüfen ob das Fahrzeug einen Checkpoint passiert hat
 		 */
 
-		final int checkPointColor = checkpt.getRGB(carMiddleX, carMiddleY);
+		final int checkPointColor = checkpt[0].getRGB(carMiddleX, carMiddleY);
 		if (new Color(checkPointColor).equals(new Color(0xffff00))) {
 			// TODO Checkpoint verification
+			lapCount++;
 			playSound();
 		}
 
