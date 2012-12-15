@@ -1,7 +1,9 @@
 package racing;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.KeyEventDispatcher;
@@ -12,10 +14,18 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -24,28 +34,60 @@ import javax.swing.Timer;
 public class Racing extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1169331112688629681L;
-	private Car raceCar;
+
+	private final String racingTrack = "silverstone";
+	private final DateFormat df = new SimpleDateFormat("mm:ss:SSS");
+	private final int lapsToDrive = 4;
+	private final long[] lapTimes = new long[lapsToDrive];
+
+	private final AlphaComposite transparent;
+	private final AlphaComposite nonTransparent;
+
+	private long lapStartTime = 0;
+	private long lapTime = 0;
+	private int checkpointsCount;
 	private int[] keys;
+	private int lapCount = 0;
+	private int nextCheckpoint = 0;
+	private Car raceCar;
 	private Dimension screenSize;
 	private Timer timer;
 	private BufferedImage track;
 	private BufferedImage texture;
-	private BufferedImage checkpt;
+	private BufferedImage[] checkpt;
 	private BufferedImage wall;
 	private BufferedImage grass;
+	private Clip cpChecked;
+	private AudioInputStream audioIn;
 
 	public Racing() {
 		try {
-			track = ImageIO.read(new File("data/tracks/silverstone/track.png"));
-			texture = ImageIO.read(new File(
-					"data/tracks/silverstone/texture.png"));
-			checkpt = ImageIO.read(new File(
-					"data/tracks/silverstone/checkpt.png"));
-			wall = ImageIO.read(new File("data/tracks/silverstone/wall.png"));
-			grass = ImageIO.read(new File("data/tracks/silverstone/grass.png"));
+			track = ImageIO.read(new File("data/tracks/" + racingTrack
+					+ "/track.png"));
+			texture = ImageIO.read(new File("data/tracks/" + racingTrack
+					+ "/texture.png"));
+			wall = ImageIO.read(new File("data/tracks/" + racingTrack
+					+ "/wall.png"));
+			grass = ImageIO.read(new File("data/tracks/" + racingTrack
+					+ "/grass.png"));
+
+			audioIn = AudioSystem.getAudioInputStream(new File(
+					"data/cpChecked.wav"));
+			cpChecked = AudioSystem.getClip();
+			cpChecked.open(audioIn);
 		} catch (final IOException e) {
 			e.printStackTrace();
+		} catch (final UnsupportedAudioFileException e) {
+			e.printStackTrace();
+		} catch (final LineUnavailableException e) {
+			e.printStackTrace();
 		}
+
+		final float alpha = 0.55f;
+		final int type = AlphaComposite.SRC_OVER;
+		transparent = AlphaComposite.getInstance(type, alpha);
+		nonTransparent = AlphaComposite.getInstance(type, 1);
+
 		init();
 	}
 
@@ -54,11 +96,14 @@ public class Racing extends JPanel implements ActionListener {
 		screenSize = new Dimension(1680, 1000);
 		setPreferredSize(screenSize);
 
-		raceCar = new Car();
+		raceCar = new RacingCar();
 		raceCar.move(1370, 400);
 		raceCar.setAngle((float) (0.838734 * 2 * Math.PI));
 
+		loadCheckPoints();
 		registerKeyListener();
+
+		Arrays.fill(lapTimes, 0);
 
 		timer = new Timer(15, this);
 		timer.start();
@@ -89,17 +134,49 @@ public class Racing extends JPanel implements ActionListener {
 
 	}
 
+	private void loadCheckPoints() {
+		final File checkPointDirectory = new File("data/tracks/" + racingTrack
+				+ "/checkpoints");
+		final String[] chps = checkPointDirectory.list();
+		checkpointsCount = chps.length;
+
+		checkpt = new BufferedImage[checkpointsCount];
+		for (int i = 0; i < checkpointsCount; i++) {
+			try {
+				checkpt[i] = ImageIO.read(new File("data/tracks/" + racingTrack
+						+ "/checkpoints/" + i + ".png"));
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	@Override
 	public void paintComponent(final Graphics g) {
-		super.paintComponent(g);
 		final Graphics2D g2d = (Graphics2D) g;
+		super.paintComponent(g);
+
 		g2d.drawImage(grass, 0, 0, null);
 		g2d.drawImage(wall, 0, 0, null);
-		g2d.drawImage(checkpt, 0, 0, null);
 		g2d.drawImage(track, 0, 0, null);
 		g2d.drawImage(texture, 0, 0, null);
-		g2d.drawString("LAP:", 1610, 15);
-		g2d.drawString("x / 4", 1640, 15);
+
+		g2d.setComposite(transparent);
+		g2d.drawImage(checkpt[nextCheckpoint], 0, 0, null);
+		g2d.setComposite(nonTransparent);
+
+		g2d.setPaint(Color.black);
+		g2d.setFont(new Font("Arial", Font.BOLD, 26));
+		g2d.drawString("LAP:  " + lapCount + "/ " + lapsToDrive, 1520, 35);
+		g2d.setFont(new Font("Arial", Font.BOLD, 18));
+		for (int i = 0; i < lapTimes.length; i++) {
+			final long lapT = lapTimes[i];
+			if (lapT != 0) {
+				g2d.drawString(
+						"LAP " + (i + 1) + ":  " + df.format(new Date(lapT)),
+						1520, 35 + (i + 1) * 20);
+			}
+		}
 		raceCar.paintComponent(g2d);
 	}
 
@@ -108,6 +185,14 @@ public class Racing extends JPanel implements ActionListener {
 		if (controlRaceCarPosition()) {
 			raceCar.move();
 		}
+	}
+
+	private void playSound() {
+		if (cpChecked.isRunning()) {
+			cpChecked.stop();
+		}
+		cpChecked.setFramePosition(0);
+		cpChecked.loop(0);
 	}
 
 	private boolean controlRaceCarPosition() {
@@ -148,9 +233,18 @@ public class Racing extends JPanel implements ActionListener {
 		 * Überprüfen ob das Fahrzeug einen Checkpoint passiert hat
 		 */
 
-		final int checkPointColor = checkpt.getRGB(carMiddleX, carMiddleY);
+		final int checkPointColor = checkpt[nextCheckpoint].getRGB(carMiddleX,
+				carMiddleY);
 		if (new Color(checkPointColor).equals(new Color(0xffff00))) {
-			// TODO Checkpoint verification
+			playSound();
+			if (nextCheckpoint == 0) {
+				lapCount++;
+				if (lapCount != 1) {
+					lapTimes[lapCount - 2] = lapTime;
+				}
+				lapStartTime = System.currentTimeMillis();
+			}
+			nextCheckpoint = (nextCheckpoint + 1) % checkpointsCount;
 		}
 
 		/*
@@ -197,7 +291,7 @@ public class Racing extends JPanel implements ActionListener {
 		}
 		if (keys[KeyEvent.VK_DOWN] == 1) {
 			if (raceCar.getSpeed() > 0) {
-				raceCar.slowdown();
+				raceCar.activateBreaks();
 			} else {
 				raceCar.deccelerate();
 			}
@@ -220,6 +314,7 @@ public class Racing extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
+		lapTime = System.currentTimeMillis() - lapStartTime;
 		repaint();
 		moveCar();
 	}
