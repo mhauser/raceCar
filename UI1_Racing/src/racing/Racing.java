@@ -36,7 +36,7 @@ public class Racing extends JPanel implements ActionListener {
 	private boolean[] checkpoints;
 	private int[] keys;
 	private int lapCount = -1;
-	private boolean init = false;
+	private int nextCheckpoint = 0;
 	private Car raceCar;
 	private Dimension screenSize;
 	private Timer timer;
@@ -114,7 +114,7 @@ public class Racing extends JPanel implements ActionListener {
 	private void loadCheckPoints() {
 		final File checkPointDirectory = new File("data/tracks/" + racingTrack
 				+ "/checkpoints");
-		final File[] chps = checkPointDirectory.listFiles();
+		final String[] chps = checkPointDirectory.list();
 		checkpointsCount = chps.length;
 
 		checkpoints = new boolean[checkpointsCount];
@@ -123,7 +123,8 @@ public class Racing extends JPanel implements ActionListener {
 		checkpt = new BufferedImage[checkpointsCount];
 		for (int i = 0; i < checkpointsCount; i++) {
 			try {
-				checkpt[i] = ImageIO.read(chps[i]);
+				checkpt[i] = ImageIO.read(new File("data/tracks/" + racingTrack
+						+ "/checkpoints/" + i + ".png"));
 			} catch (final IOException e) {
 				e.printStackTrace();
 			}
@@ -134,17 +135,12 @@ public class Racing extends JPanel implements ActionListener {
 	public void paintComponent(final Graphics g) {
 		final Graphics2D g2d = (Graphics2D) g;
 		super.paintComponent(g);
-		if (!init) {
-			for (final BufferedImage chpt : checkpt) {
-				g2d.drawImage(chpt, 0, 0, null);
-			}
-			init = true;
-		}
 
 		g2d.drawImage(grass, 0, 0, null);
 		g2d.drawImage(wall, 0, 0, null);
 		g2d.drawImage(track, 0, 0, null);
 		g2d.drawImage(texture, 0, 0, null);
+		g2d.drawImage(checkpt[nextCheckpoint], 0, 0, null);
 
 		g2d.setFont(new Font("Arial", Font.BOLD, 26));
 		g2d.drawString("LAP:  " + lapCount + "/ 4", 1540, 35);
@@ -204,11 +200,14 @@ public class Racing extends JPanel implements ActionListener {
 		 * Überprüfen ob das Fahrzeug einen Checkpoint passiert hat
 		 */
 
-		final int checkPointColor = checkpt[0].getRGB(carMiddleX, carMiddleY);
+		final int checkPointColor = checkpt[nextCheckpoint].getRGB(carMiddleX,
+				carMiddleY);
 		if (new Color(checkPointColor).equals(new Color(0xffff00))) {
-			// TODO Checkpoint verification
-			lapCount++;
 			playSound();
+			if (nextCheckpoint == 0) {
+				lapCount++;
+			}
+			nextCheckpoint = (nextCheckpoint + 1) % checkpointsCount;
 		}
 
 		/*
