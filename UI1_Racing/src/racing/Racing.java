@@ -93,7 +93,7 @@ public class Racing extends JPanel implements ActionListener {
 
 	private void init() {
 
-		screenSize = new Dimension(1680, 1000);
+		screenSize = new Dimension(1900, 1000);
 		setPreferredSize(screenSize);
 
 		raceCar = new RacingCar();
@@ -166,15 +166,16 @@ public class Racing extends JPanel implements ActionListener {
 		g2d.setComposite(nonTransparent);
 
 		g2d.setPaint(Color.black);
+		final int stringX = screenSize.width - 160;
 		g2d.setFont(new Font("Arial", Font.BOLD, 26));
-		g2d.drawString("LAP:  " + lapCount + "/ " + lapsToDrive, 1520, 35);
+		g2d.drawString("LAP:  " + lapCount + "/ " + lapsToDrive, stringX, 35);
 		g2d.setFont(new Font("Arial", Font.BOLD, 18));
 		for (int i = 0; i < lapTimes.length; i++) {
 			final long lapT = lapTimes[i];
 			if (lapT != 0) {
 				g2d.drawString(
 						"LAP " + (i + 1) + ":  " + df.format(new Date(lapT)),
-						1520, 35 + (i + 1) * 20);
+						stringX, 35 + (i + 1) * 20);
 			}
 		}
 		raceCar.paintComponent(g2d);

@@ -14,7 +14,7 @@ public class RacingCar extends Car {
 
 	@Override
 	public double getAcceleration() {
-		return 0.1;
+		return 0.14;
 	}
 
 	@Override
