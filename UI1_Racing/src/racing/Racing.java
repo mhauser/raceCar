@@ -75,7 +75,7 @@ public class Racing extends JPanel implements ActionListener {
 		screenSize = new Dimension(1680, 1000);
 		setPreferredSize(screenSize);
 
-		raceCar = new Car();
+		raceCar = new RacingCar();
 		raceCar.move(1370, 400);
 		raceCar.setAngle((float) (0.838734 * 2 * Math.PI));
 
@@ -144,25 +144,21 @@ public class Racing extends JPanel implements ActionListener {
 			if (x <= 0) {
 				raceCar.move(raceCar.getX() + 1, raceCar.getY());
 				raceCar.stop();
-				playSound();
 				return false;
 			}
 			if (x >= dim.width) {
 				raceCar.move(raceCar.getX() - 1, raceCar.getY());
 				raceCar.stop();
-				playSound();
 				return false;
 			}
 			if (y <= 0) {
 				raceCar.move(raceCar.getX(), raceCar.getY() + 1);
 				raceCar.stop();
-				playSound();
 				return false;
 			}
 			if (y >= dim.height) {
 				raceCar.move(raceCar.getX(), raceCar.getY() - 1);
 				raceCar.stop();
-				playSound();
 				return false;
 			}
 		}
@@ -176,6 +172,7 @@ public class Racing extends JPanel implements ActionListener {
 		final int checkPointColor = checkpt.getRGB(carMiddleX, carMiddleY);
 		if (new Color(checkPointColor).equals(new Color(0xffff00))) {
 			// TODO Checkpoint verification
+			playSound();
 		}
 
 		/*

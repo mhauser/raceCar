@@ -1,24 +1,23 @@
 package racing;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-public class Car extends JComponent {
+public abstract class Car extends JComponent {
 
 	private static final long serialVersionUID = -8147987130820080891L;
 	public static final double SLOW_SPEED = 1;
-	public static final double MAX_FORWARD_SPEED = 6;
-	public static final double MAX_BACKWARD_SPEED = -2;
-	private double x = 0, y = 0, oldX = 0, oldY = 0;
-	private float angle = 0;
+
+	protected double x = 0;
+	protected double y = 0;
+	protected float angle = 0;
+
+	private double oldX = 0;
+	private double oldY = 0;
 	private double speed = 0.0;
 
 	public Car() {
@@ -43,53 +42,19 @@ public class Car extends JComponent {
 		move(newX, newY);
 	}
 
-	@Override
-	protected void paintComponent(final Graphics g) {
-		super.paintComponent(g);
-		final Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		/*
-		 * Verschieben des Zeichenrasters um x und y drehen der Fl�che um den
-		 * Winkle angle
-		 */
-		g2d.translate(x, y);
-		g2d.rotate(angle);
-
-		// Beispielzeichnung ersetzten durch ihre eigene
-		g2d.setPaint(Color.red);
-		g2d.fillRect(-15, -20, 30, 40);
-		g2d.setPaint(new Color(0x727272));
-		g2d.fillRect(-20, -18, 5, 10);
-		g2d.fillRect(15, -18, 5, 10);
-		g2d.fillRect(-20, 8, 5, 10);
-		g2d.fillRect(15, 8, 5, 10);
-
-		g2d.setPaint(Color.yellow);
-		g2d.fillRect(-12, 10, 24, 5);
-
-		g2d.setPaint(new Color(0xBFD7FF));
-		g2d.fillPolygon(new int[] { 0, -10, 10 }, new int[] { -17, 5, 5 }, 3);
-
-	}
-
 	private int doubleToInt(final double doubleValue) {
 		final int baseInt = (int) doubleValue;
-		if (doubleValue - baseInt >= 0.5) {
-			return baseInt + 1;
-		} else {
-			return baseInt;
-		}
+		return doubleValue - baseInt >= 0.5 ? baseInt + 1 : baseInt;
 	}
 
 	public void accelerate() {
-		if (speed <= MAX_FORWARD_SPEED) {
+		if (speed <= getMaxForwardSpeed()) {
 			speed += 0.1;
 		}
 	}
 
 	public void deccelerate() {
-		if (speed >= MAX_BACKWARD_SPEED) {
+		if (speed >= getMaxBackwardSpeed()) {
 			speed -= 0.1;
 		}
 	}
@@ -130,11 +95,11 @@ public class Car extends JComponent {
 	}
 
 	public void turnRight() {
-		angle += Math.PI / 40;
+		angle += Math.PI / (40 / getAgility());
 	}
 
 	public void turnLeft() {
-		angle -= Math.PI / 40;
+		angle -= Math.PI / (40 / getAgility());
 	}
 
 	@Override
@@ -167,22 +132,7 @@ public class Car extends JComponent {
 		this.angle = angle;
 	}
 
-	public List<Dimension> getCollisionModel() {
-		final List<Dimension> collisionModel = new ArrayList<>();
-
-		collisionModel.add(calculateMatrix(x - 20, y + 20));
-		collisionModel.add(calculateMatrix(x + 20, y + 20));
-		collisionModel.add(calculateMatrix(x - 20, y - 20));
-		collisionModel.add(calculateMatrix(x + 20, y - 20));
-		collisionModel.add(calculateMatrix(x, y + 20));
-		collisionModel.add(calculateMatrix(x, y - 20));
-		collisionModel.add(calculateMatrix(x + 20, y));
-		collisionModel.add(calculateMatrix(x - 20, y));
-		collisionModel.add(calculateMatrix(x, y));
-		return collisionModel;
-	}
-
-	private Dimension calculateMatrix(double absoluteX, double absoluteY) {
+	protected Dimension calculateMatrix(double absoluteX, double absoluteY) {
 		absoluteX -= x;
 		absoluteY -= y;
 		final double rotatedX = (Math.cos(angle) * absoluteX)
@@ -195,24 +145,38 @@ public class Car extends JComponent {
 		return d;
 	}
 
-	public static void main(final String[] args) {
-		final JFrame f = new JFrame("Racing");
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		final Car c = new Car();
-		c.move(50, 50);
-		f.add(c);
-		f.setSize(200, 240);
-		f.setResizable(false);
-		f.setVisible(true);
-
-	}
-
 	public void bumpBack() {
 		if (speed >= 0) {
 			speed = -3;
 		} else {
 			speed = 3;
 		}
+	}
+
+	public abstract List<Dimension> getCollisionModel();
+
+	public abstract double getAcceleration();
+
+	public abstract double getAgility();
+
+	public abstract double getMaxForwardSpeed();
+
+	public abstract double getMaxBackwardSpeed();
+
+	@Override
+	protected void paintComponent(final Graphics g) {
+		super.paintComponent(g);
+	}
+
+	public static void main(final String[] args) {
+		final JFrame f = new JFrame("Racing");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		final Car c = new RacingCar();
+		c.move(50, 50);
+		f.add(c);
+		f.setSize(200, 240);
+		f.setResizable(false);
+		f.setVisible(true);
 
 	}
 
