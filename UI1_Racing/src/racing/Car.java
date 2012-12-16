@@ -20,9 +20,6 @@ public abstract class Car extends JComponent {
 	private double oldY = 0;
 	private double speed = 0.0;
 
-	public Car() {
-	}
-
 	@Override
 	public void move(final int x, final int y) {
 		this.x = x;
@@ -49,7 +46,7 @@ public abstract class Car extends JComponent {
 
 	public void accelerate() {
 		if (speed <= getMaxForwardSpeed()) {
-			speed += 0.1;
+			speed += getAcceleration();
 		}
 	}
 
