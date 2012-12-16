@@ -151,9 +151,9 @@ public abstract class Car extends JComponent {
 
 	public void bumpBack() {
 		if (speed >= 0) {
-			speed = -3;
+			speed = -0.3 * speed;
 		} else {
-			speed = 3;
+			speed = 0.3 * (2 * speed);
 		}
 	}
 
