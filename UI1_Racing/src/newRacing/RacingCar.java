@@ -3,11 +3,16 @@ package newRacing;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 
 public class RacingCar extends Car {
 
 	private static final long serialVersionUID = 386056963794072270L;
+
+	public RacingCar(final Point start) {
+		super(start);
+	}
 
 	@Override
 	public double getAcceleration() {
@@ -31,11 +36,12 @@ public class RacingCar extends Car {
 
 	@Override
 	protected void paintComponent(final Graphics g) {
-		super.paintComponent(g);
+		// super.paintComponent(g);
 		final Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
+		g2d.translate(x, y);
 		g2d.rotate(angle);
 
 		g2d.setPaint(Color.red);
@@ -52,6 +58,7 @@ public class RacingCar extends Car {
 		g2d.setPaint(new Color(0xBFD7FF));
 		g2d.fillPolygon(new int[] { 0, -10, 10 }, new int[] { -17, 5, 5 }, 3);
 
+		g2d.translate(-x, -y);
 	}
 
 	// @Override

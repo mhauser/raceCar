@@ -16,8 +16,9 @@ public class Map extends JComponent {
 	private static final long serialVersionUID = -4735738015518168941L;
 	private final String racingTrack;
 
-	private double x = 400;
-	private double y = 300;
+	private double x;
+	private double y;
+	private final Point startPoint;
 
 	private BufferedImage track;
 	private BufferedImage texture;
@@ -27,7 +28,11 @@ public class Map extends JComponent {
 
 	private int checkpointsCount;
 
-	public Map(final String trackName) {
+	public Map(final String trackName, final Point start) {
+		startPoint = start;
+		x = start.x;
+		y = start.y;
+
 		racingTrack = trackName;
 
 		try {
@@ -68,7 +73,12 @@ public class Map extends JComponent {
 		super.paintComponent(g);
 		final Graphics2D g2d = (Graphics2D) g;
 
-		g2d.translate(x, y);
+		g2d.translate(startPoint.x - x, startPoint.y - y);
+
+		g2d.drawImage(grass, 0, 0, null);
+		g2d.drawImage(wall, 0, 0, null);
+		g2d.drawImage(track, 0, 0, null);
+		g2d.drawImage(texture, 0, 0, null);
 	}
 
 	public Color getColorAtPoint(final Point p) {

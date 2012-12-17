@@ -8,22 +8,17 @@ import javax.swing.JComponent;
 public abstract class Car extends JComponent {
 
 	private static final long serialVersionUID = 4791116509704882431L;
-	public static final double SLOW_SPEED = 1;
+	private static final double SLOW_SPEED = 1;
 
 	protected float angle = 0;
-	private double speed = 0.0;
+	protected double speed = 0.0;
 
-	private double x = 0;
-	private double y = 0;
+	protected double x = 0;
+	protected double y = 0;
 
 	public Car(final Point start) {
 		x = start.x;
 		y = start.y;
-	}
-
-	@Override
-	protected void paintComponent(final Graphics g) {
-		super.paintComponent(g);
 	}
 
 	public void move() {
@@ -102,6 +97,9 @@ public abstract class Car extends JComponent {
 	}
 
 	// public abstract List<Dimension> getCollisionModel();
+
+	@Override
+	protected abstract void paintComponent(final Graphics g);
 
 	public abstract double getAcceleration();
 

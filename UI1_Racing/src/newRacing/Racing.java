@@ -1,26 +1,38 @@
 package newRacing;
 
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
+import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Racing implements ActionListener {
+public class Racing extends JPanel implements ActionListener {
+
+	private static final long serialVersionUID = -6136344536323335103L;
 
 	private int[] keys;
 	private final Car raceCar;
 	private final Map map;
 	private final Timer timer;
+	private final Dimension screenSize;
+	private final Point start;
 
 	public Racing() {
-		raceCar = new RacingCar();
-		map = new Map("monaco");
+		start = new Point(400, 300);
+		raceCar = new RacingCar(start);
+		map = new Map("monaco", start);
 
 		registerKeyListener();
+
+		screenSize = new Dimension(1900, 1000);
+		setPreferredSize(screenSize);
 
 		timer = new Timer(15, this);
 		timer.start();
@@ -33,8 +45,16 @@ public class Racing implements ActionListener {
 		raceCar.move();
 		map.moveTo(raceCar.getXCoordinate(), raceCar.getYCoordinate());
 
-		raceCar.repaint();
-		map.repaint();
+		repaint();
+	}
+
+	@Override
+	protected void paintComponent(final Graphics g) {
+		super.paintComponent(g);
+
+		map.paintComponent(g);
+		// g.translate(start.x, start.y);
+		raceCar.paintComponent(g);
 	}
 
 	private void registerKeyListener() {
