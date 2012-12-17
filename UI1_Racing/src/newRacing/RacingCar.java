@@ -5,13 +5,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 
 public class RacingCar extends Car {
 
 	private static final long serialVersionUID = 386056963794072270L;
+	private BufferedImage car = null;
 
-	public RacingCar(final Point start) {
-		super(start);
+	public RacingCar(final Point start, final float angleInDeg) {
+		super(start, angleInDeg);
 	}
 
 	@Override
@@ -36,29 +38,39 @@ public class RacingCar extends Car {
 
 	@Override
 	protected void paintComponent(final Graphics g) {
-		// super.paintComponent(g);
 		final Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g2d.translate(x, y);
 		g2d.rotate(angle);
 
+		if (car == null) {
+			createCar();
+		}
+
+		g2d.drawImage(car, null, -20, -20);
+		g2d.translate(-x, -y);
+	}
+
+	private void createCar() {
+		car = new BufferedImage(40, 40, BufferedImage.TRANSLUCENT);
+		final Graphics2D g2d = car.createGraphics();
+
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+
 		g2d.setPaint(Color.red);
-		g2d.fillRect(-15, -20, 30, 40);
+		g2d.fillRect(5, 0, 30, 40);
 		g2d.setPaint(new Color(0x727272));
-		g2d.fillRect(-20, -18, 5, 10);
-		g2d.fillRect(15, -18, 5, 10);
-		g2d.fillRect(-20, 8, 5, 10);
-		g2d.fillRect(15, 8, 5, 10);
+		g2d.fillRect(0, 2, 5, 10);
+		g2d.fillRect(35, 2, 5, 10);
+		g2d.fillRect(0, 28, 5, 10);
+		g2d.fillRect(35, 28, 5, 10);
 
 		g2d.setPaint(Color.yellow);
-		g2d.fillRect(-12, 10, 24, 5);
+		g2d.fillRect(8, 30, 24, 5);
 
 		g2d.setPaint(new Color(0xBFD7FF));
-		g2d.fillPolygon(new int[] { 0, -10, 10 }, new int[] { -17, 5, 5 }, 3);
-
-		g2d.translate(-x, -y);
+		g2d.fillPolygon(new int[] { 20, 10, 30 }, new int[] { 3, 25, 25 }, 3);
 	}
 
 	// @Override

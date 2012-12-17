@@ -70,7 +70,6 @@ public class Map extends JComponent {
 
 	@Override
 	protected void paintComponent(final Graphics g) {
-		super.paintComponent(g);
 		final Graphics2D g2d = (Graphics2D) g;
 
 		g2d.translate(startPoint.x - x, startPoint.y - y);

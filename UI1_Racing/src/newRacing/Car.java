@@ -16,9 +16,10 @@ public abstract class Car extends JComponent {
 	protected double x = 0;
 	protected double y = 0;
 
-	public Car(final Point start) {
+	public Car(final Point start, final float angleInDeg) {
 		x = start.x;
 		y = start.y;
+		angle = (float) (angleInDeg / 360 * 2 * Math.PI);
 	}
 
 	public void move() {
@@ -32,6 +33,10 @@ public abstract class Car extends JComponent {
 
 	public double getYCoordinate() {
 		return y;
+	}
+
+	public float getAngle() {
+		return angle;
 	}
 
 	public void accelerate() {

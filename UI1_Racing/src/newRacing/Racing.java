@@ -24,14 +24,18 @@ public class Racing extends JPanel implements ActionListener {
 	private final Dimension screenSize;
 	private final Point start;
 
-	public Racing() {
-		start = new Point(400, 300);
-		raceCar = new RacingCar(start);
+	public Racing(final Dimension dim) {
+		screenSize = new Dimension(dim.width - 20, dim.height - 70);
+
+		// start = new Point(screenSize.width / 2, screenSize.height / 2);
+		start = new Point(308, 626);
+		// TODO start coordinates and angle depending on track
+
+		raceCar = new RacingCar(start, 20.7f);
 		map = new Map("monaco", start);
 
 		registerKeyListener();
 
-		screenSize = new Dimension(1900, 1000);
 		setPreferredSize(screenSize);
 
 		timer = new Timer(15, this);
@@ -53,7 +57,6 @@ public class Racing extends JPanel implements ActionListener {
 		super.paintComponent(g);
 
 		map.paintComponent(g);
-		// g.translate(start.x, start.y);
 		raceCar.paintComponent(g);
 	}
 
