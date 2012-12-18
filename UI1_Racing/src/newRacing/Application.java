@@ -1,17 +1,47 @@
 package newRacing;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
-public class Application {
+public class Application extends JFrame {
 
-	/**
-	 * @param args
-	 */
+	private static final long serialVersionUID = -1824092949935612488L;
+	private final GraphicsDevice device;
+	private final Dimension dim;
+
+	public Application(final GraphicsDevice device, final Dimension dim) {
+		super(device.getDefaultConfiguration());
+		this.device = device;
+		this.dim = dim;
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+	}
+
+	private void begin() {
+		final boolean isFullScreen = device.isFullScreenSupported();
+		setUndecorated(isFullScreen);
+		setResizable(!isFullScreen);
+		if (isFullScreen) {
+			// Full-screen mode
+			device.setFullScreenWindow(this);
+			validate();
+		} else {
+			// Windowed mode
+			pack();
+			setVisible(true);
+		}
+	}
+
+	private void initComponents(final Container c) {
+		add(new Racing(dim));
+	}
+
 	public static void main(final String[] args) throws Exception {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
@@ -21,21 +51,19 @@ public class Application {
 		System.out
 				.println("Height of Screen Size is " + dim.height + " pixels");
 
+		final GraphicsEnvironment env = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		final GraphicsDevice defaultScreen = env.getDefaultScreenDevice();
+		System.out.println("isFullScreenSupported: "
+				+ defaultScreen.isFullScreenSupported());
+
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				try {
-					final JFrame f = new JFrame("Racing");
-					f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-					f.add(new Racing(dim));
-					f.setResizable(false);
-					f.pack();
-					f.setVisible(true);
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
+				final Application window = new Application(defaultScreen, dim);
+				window.initComponents(window.getContentPane());
+				window.begin();
 			}
 		});
 	}
-
 }

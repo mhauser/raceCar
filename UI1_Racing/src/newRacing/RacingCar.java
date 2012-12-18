@@ -23,7 +23,7 @@ public class RacingCar extends Car {
 
 	@Override
 	public double getAgility() {
-		return 1.4;
+		return 1.2;
 	}
 
 	@Override

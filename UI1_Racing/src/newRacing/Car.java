@@ -9,9 +9,11 @@ public abstract class Car extends JComponent {
 
 	private static final long serialVersionUID = 4791116509704882431L;
 	private static final double SLOW_SPEED = 1;
+	private static final float PI = (float) Math.PI;
 
 	protected float angle = 0;
 	protected double speed = 0.0;
+	protected float condition = 1;
 
 	protected double x = 0;
 	protected double y = 0;
@@ -19,7 +21,7 @@ public abstract class Car extends JComponent {
 	public Car(final Point start, final float angleInDeg) {
 		x = start.x;
 		y = start.y;
-		angle = (float) (angleInDeg / 360 * 2 * Math.PI);
+		angle = angleInDeg / 360 * 2 * PI;
 	}
 
 	public void move() {
@@ -33,6 +35,10 @@ public abstract class Car extends JComponent {
 
 	public double getYCoordinate() {
 		return y;
+	}
+
+	public Point getPoint() {
+		return new Point((int) x, (int) y);
 	}
 
 	public float getAngle() {
@@ -87,6 +93,17 @@ public abstract class Car extends JComponent {
 
 	public void stop() {
 		speed = 0;
+	}
+
+	public void collide() {
+		angle = angle + PI;
+		x += Math.sin(angle) * speed;
+		y -= Math.cos(angle) * speed;
+
+		// TODO better physics xD
+
+		speed *= 0.1;
+		condition = (float) (condition - 0.1 * (speed / getMaxForwardSpeed()));
 	}
 
 	public void turnRight() {

@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -20,36 +21,49 @@ public class Racing extends JPanel implements ActionListener {
 	private int[] keys;
 	private final Car raceCar;
 	private final Map map;
-	private final Timer timer;
+	// private final Timer timer;
 	private final Dimension screenSize;
 	private final Point start;
 
 	public Racing(final Dimension dim) {
-		screenSize = new Dimension(dim.width - 20, dim.height - 70);
+		// screenSize = new Dimension(dim.width - 20, dim.height - 70);
+		screenSize = dim;
 
 		// start = new Point(screenSize.width / 2, screenSize.height / 2);
 		start = new Point(308, 626);
 		// TODO start coordinates and angle depending on track
 
 		raceCar = new RacingCar(start, 20.7f);
-		map = new Map("monaco", start);
+		map = new Map("mc", start, screenSize);
 
 		registerKeyListener();
 
 		setPreferredSize(screenSize);
 
-		timer = new Timer(15, this);
-		timer.start();
+		new Timer(15, this).start();
 	}
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
 		keyProcessing();
 
+		validatePosition();
 		raceCar.move();
 		map.moveTo(raceCar.getXCoordinate(), raceCar.getYCoordinate());
 
 		repaint();
+	}
+
+	private void validatePosition() {
+		if (!map.isOnMap(raceCar.getPoint())) {
+			// raceCar.stop();
+			raceCar.collide();
+			return;
+		}
+
+		final int col = map.getRGBAtPoint(raceCar.getPoint());
+
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -87,6 +101,9 @@ public class Racing extends JPanel implements ActionListener {
 
 	private void keyProcessing() {
 
+		if (keys[KeyEvent.VK_ESCAPE] == 1) {
+			System.exit(JFrame.EXIT_ON_CLOSE);
+		}
 		if (keys[KeyEvent.VK_UP] == 1) {
 			raceCar.accelerate();
 		}
