@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +23,12 @@ public class Map extends JComponent {
 	private double y;
 	private final Point startPoint;
 	private final Dimension screenSize;
+
+	final int grassSize;
+	final int xTimesGrass;
+	final int yTimesGrass;
+	final int deltaXGrass;
+	final int deltaYGrass;
 
 	private BufferedImage track;
 	private BufferedImage texture;
@@ -40,17 +48,40 @@ public class Map extends JComponent {
 		racingTrack = trackName;
 
 		try {
-			track = ImageIO.read(new File("data/tracks/" + racingTrack
-					+ "/track.png"));
+			// track = ImageIO.read(new File("data/tracks/" + racingTrack
+			// + "/track.png"));
 			texture = ImageIO.read(new File("data/tracks/" + racingTrack
 					+ "/texture.png"));
 			wall = ImageIO.read(new File("data/tracks/" + racingTrack
 					+ "/wall.png"));
-			grass = ImageIO.read(new File("data/tracks/" + racingTrack
-					+ "/grass.png"));
+			grass = ImageIO.read(new File("data/grass.jpg"));
+
+			track = SVGLoader.getSVGImage("/tracks/" + racingTrack
+					+ "/track.svg", texture.getWidth(), texture.getHeight());
+
+			final AffineTransform at = new AffineTransform();
+			final double scaleFactor = 1.5;
+			at.scale(scaleFactor, scaleFactor);
+			final AffineTransformOp scaleOp = new AffineTransformOp(at,
+					AffineTransformOp.TYPE_BILINEAR);
+
+			track = scaleOp.filter(track, null);
+			texture = scaleOp.filter(texture, null);
+			wall = scaleOp.filter(wall, null);
+
+			track.flush();
+			texture.flush();
+			wall.flush();
+
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
+
+		grassSize = grass.getWidth();
+		xTimesGrass = track.getWidth() / grassSize + 1;
+		yTimesGrass = track.getHeight() / grassSize + 1;
+		deltaXGrass = (xTimesGrass * grassSize - track.getWidth()) / 2;
+		deltaYGrass = (yTimesGrass * grassSize - track.getHeight()) / 2;
 
 		loadCheckPoints();
 	}
@@ -75,18 +106,15 @@ public class Map extends JComponent {
 	@Override
 	protected void paintComponent(final Graphics g) {
 		final Graphics2D g2d = (Graphics2D) g;
-
 		g2d.translate(startPoint.x - x, startPoint.y - y);
 
-		// g2d.drawImage(grass, 0, 0, screenSize.width, screenSize.height,
-		// null);
-		// g2d.drawImage(wall, 0, 0, screenSize.width, screenSize.height, null);
-		// g2d.drawImage(track, 0, 0, screenSize.width, screenSize.height,
-		// null);
-		// g2d.drawImage(texture, 0, 0, screenSize.width, screenSize.height,
-		// null);
+		for (int i = 0; i < xTimesGrass; i++) {
+			for (int j = 0; j < yTimesGrass; j++) {
+				g2d.drawImage(grass, -deltaXGrass + i * grassSize, -deltaYGrass
+						+ j * grassSize, null);
+			}
+		}
 
-		g2d.drawImage(grass, 0, 0, null);
 		g2d.drawImage(wall, 0, 0, null);
 		g2d.drawImage(track, 0, 0, null);
 		g2d.drawImage(texture, 0, 0, null);

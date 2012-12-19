@@ -1,8 +1,6 @@
 package newRacing;
 
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
@@ -38,7 +36,7 @@ public class Application extends JFrame {
 		}
 	}
 
-	private void initComponents(final Container c) {
+	private void initComponents() {
 		add(new Racing(dim));
 	}
 
@@ -57,13 +55,14 @@ public class Application extends JFrame {
 		System.out.println("isFullScreenSupported: "
 				+ defaultScreen.isFullScreenSupported());
 
-		EventQueue.invokeLater(new Runnable() {
+		new Thread() {
 			@Override
 			public void run() {
+				setPriority(MAX_PRIORITY);
 				final Application window = new Application(defaultScreen, dim);
-				window.initComponents(window.getContentPane());
+				window.initComponents();
 				window.begin();
 			}
-		});
+		}.start();
 	}
 }

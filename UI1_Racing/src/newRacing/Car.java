@@ -38,7 +38,7 @@ public abstract class Car extends JComponent {
 	}
 
 	public Point getPoint() {
-		return new Point((int) x, (int) y);
+		return new Point((int) getXCoordinate(), (int) getYCoordinate());
 	}
 
 	public float getAngle() {
@@ -96,22 +96,18 @@ public abstract class Car extends JComponent {
 	}
 
 	public void collide() {
-		angle = angle + PI;
-		x += Math.sin(angle) * speed;
-		y -= Math.cos(angle) * speed;
-
 		// TODO better physics xD
-
-		speed *= 0.1;
+		speed *= -0.6;
+		move();
 		condition = (float) (condition - 0.1 * (speed / getMaxForwardSpeed()));
 	}
 
 	public void turnRight() {
-		angle += Math.PI / (40 / getAgility());
+		angle += PI / (40 / getAgility());
 	}
 
 	public void turnLeft() {
-		angle -= Math.PI / (40 / getAgility());
+		angle -= PI / (40 / getAgility());
 	}
 
 	public double getSpeed() {

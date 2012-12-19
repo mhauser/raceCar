@@ -21,30 +21,32 @@ public class Racing extends JPanel implements ActionListener {
 	private int[] keys;
 	private final Car raceCar;
 	private final Map map;
-	// private final Timer timer;
+	private final Timer timer;
 	private final Dimension screenSize;
 	private final Point start;
 
+	private long lastActionPerformed = 0;
+
 	public Racing(final Dimension dim) {
-		// screenSize = new Dimension(dim.width - 20, dim.height - 70);
 		screenSize = dim;
 
-		// start = new Point(screenSize.width / 2, screenSize.height / 2);
-		start = new Point(308, 626);
+		start = new Point(screenSize.width / 2, screenSize.height / 2);
 		// TODO start coordinates and angle depending on track
 
 		raceCar = new RacingCar(start, 20.7f);
-		map = new Map("mc", start, screenSize);
+		map = new Map("monaco", start, screenSize);
 
 		registerKeyListener();
 
 		setPreferredSize(screenSize);
 
-		new Timer(15, this).start();
+		timer = new Timer(15, this);
+		timer.start();
 	}
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
+		final long loopStartTime = System.nanoTime();
 		keyProcessing();
 
 		validatePosition();
@@ -52,6 +54,11 @@ public class Racing extends JPanel implements ActionListener {
 		map.moveTo(raceCar.getXCoordinate(), raceCar.getYCoordinate());
 
 		repaint();
+		// System.out.print((System.nanoTime() - loopStartTime) / 1000000.0
+		// + " / ");
+		// System.out.println((System.currentTimeMillis() -
+		// lastActionPerformed));
+		lastActionPerformed = System.currentTimeMillis();
 	}
 
 	private void validatePosition() {
@@ -102,6 +109,7 @@ public class Racing extends JPanel implements ActionListener {
 	private void keyProcessing() {
 
 		if (keys[KeyEvent.VK_ESCAPE] == 1) {
+			timer.stop();
 			System.exit(JFrame.EXIT_ON_CLOSE);
 		}
 		if (keys[KeyEvent.VK_UP] == 1) {
@@ -129,5 +137,32 @@ public class Racing extends JPanel implements ActionListener {
 			}
 		}
 	}
+}
 
+class MyTimer extends Thread {
+	private final ActionListener actionListener;
+	private final long delay;
+	private boolean running = false;
+
+	public MyTimer(final long d, final ActionListener al) {
+		actionListener = al;
+		running = true;
+		delay = d;
+	}
+
+	@Override
+	public void run() {
+		while (running) {
+			actionListener.actionPerformed(null);
+			try {
+				sleep(delay);
+			} catch (final InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void staahp() {
+		running = false;
+	}
 }
