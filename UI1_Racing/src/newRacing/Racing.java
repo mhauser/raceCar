@@ -34,7 +34,7 @@ public class Racing extends JPanel implements ActionListener {
 		// TODO start coordinates and angle depending on track
 
 		raceCar = new RacingCar(start, 20.7f);
-		map = new Map("monaco", start, screenSize);
+		map = new Map("mc", start, screenSize);
 
 		registerKeyListener();
 
@@ -54,10 +54,9 @@ public class Racing extends JPanel implements ActionListener {
 		map.moveTo(raceCar.getXCoordinate(), raceCar.getYCoordinate());
 
 		repaint();
-		// System.out.print((System.nanoTime() - loopStartTime) / 1000000.0
-		// + " / ");
-		// System.out.println((System.currentTimeMillis() -
-		// lastActionPerformed));
+		System.out.print((System.nanoTime() - loopStartTime) / 1000000.0
+				+ " / ");
+		System.out.println((System.currentTimeMillis() - lastActionPerformed));
 		lastActionPerformed = System.currentTimeMillis();
 	}
 

@@ -48,19 +48,19 @@ public class Map extends JComponent {
 		racingTrack = trackName;
 
 		try {
-			// track = ImageIO.read(new File("data/tracks/" + racingTrack
-			// + "/track.png"));
+			track = ImageIO.read(new File("data/tracks/" + racingTrack
+					+ "/track.png"));
 			texture = ImageIO.read(new File("data/tracks/" + racingTrack
 					+ "/texture.png"));
 			wall = ImageIO.read(new File("data/tracks/" + racingTrack
 					+ "/wall.png"));
 			grass = ImageIO.read(new File("data/grass.jpg"));
 
-			track = SVGLoader.getSVGImage("/tracks/" + racingTrack
-					+ "/track.svg", texture.getWidth(), texture.getHeight());
+			// track = SVGLoader.getSVGImage("/tracks/" + racingTrack
+			// + "/track.svg", texture.getWidth(), texture.getHeight());
 
 			final AffineTransform at = new AffineTransform();
-			final double scaleFactor = 1.5;
+			final double scaleFactor = 1.7;
 			at.scale(scaleFactor, scaleFactor);
 			final AffineTransformOp scaleOp = new AffineTransformOp(at,
 					AffineTransformOp.TYPE_BILINEAR);
