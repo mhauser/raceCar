@@ -63,10 +63,8 @@ public final class RaceDrawing extends JPanel implements ActionListener {
 		buttons[PLAYER_NEXT] = new Rectangle(155, 20, 35, 35);
 
 		try {
-			// bi_mute = ImageIO.read(new File("data/icons/mute.png"));
-			// bi_noMute = ImageIO.read(new File("data/icons/noMute.png"));
-			bi_mute = null;
-			bi_noMute = null;
+			bi_mute = ImageIO.read(new File("data/icons/mute.png"));
+			bi_noMute = ImageIO.read(new File("data/icons/noMute.png"));
 			bi_prev = ImageIO.read(new File("data/icons/prev.png"));
 			bi_play = ImageIO.read(new File("data/icons/play.png"));
 			bi_pause = ImageIO.read(new File("data/icons/pause.png"));
@@ -74,9 +72,9 @@ public final class RaceDrawing extends JPanel implements ActionListener {
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-		buttonIcons[PLAYER_MUTE] = bi_mute;
+		buttonIcons[PLAYER_MUTE] = bi_noMute;
 		buttonIcons[PLAYER_PREV] = bi_prev;
-		buttonIcons[PLAYER_PLAY] = bi_play;
+		buttonIcons[PLAYER_PLAY] = bi_pause;
 		buttonIcons[PLAYER_NEXT] = bi_next;
 
 		return new Rectangle(20, 20, 170, 35);
@@ -109,23 +107,20 @@ public final class RaceDrawing extends JPanel implements ActionListener {
 				return;
 			}
 			if (buttons[PLAYER_MUTE].contains(clickPoint)) {
-				System.out.println("mute");
 				if (musicPlayer.isMuted()) {
 					musicPlayer.mute(false);
-					changeIcon(PLAYER_MUTE, bi_mute);
+					changeIcon(PLAYER_MUTE, bi_noMute);
 				} else {
 					musicPlayer.mute(true);
-					changeIcon(PLAYER_MUTE, bi_noMute);
+					changeIcon(PLAYER_MUTE, bi_mute);
 				}
 				return;
 			}
 			if (buttons[PLAYER_PREV].contains(clickPoint)) {
-				System.out.println("prev");
 				musicPlayer.previous();
 				return;
 			}
 			if (buttons[PLAYER_PLAY].contains(clickPoint)) {
-				System.out.println("play");
 				if (musicPlayer.isPaused()) {
 					musicPlayer.play();
 					changeIcon(PLAYER_PLAY, bi_pause);
@@ -136,7 +131,6 @@ public final class RaceDrawing extends JPanel implements ActionListener {
 				return;
 			}
 			if (buttons[PLAYER_NEXT].contains(clickPoint)) {
-				System.out.println("next");
 				musicPlayer.next();
 				return;
 			}

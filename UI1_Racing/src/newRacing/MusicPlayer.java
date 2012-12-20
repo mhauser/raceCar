@@ -2,8 +2,8 @@ package newRacing;
 
 public class MusicPlayer {
 
-	private boolean paused;
-	private boolean muted;
+	private boolean paused = false;
+	private boolean muted = false;
 
 	public MusicPlayer() {
 	}
