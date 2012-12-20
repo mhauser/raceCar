@@ -15,16 +15,13 @@ import javax.swing.Timer;
 
 public class Racing implements ActionListener {
 
-	private static final long serialVersionUID = -6136344536323335103L;
-
 	private int[] keys;
 	private final Car raceCar;
 	private final Map map;
 	private final Dimension screenSize;
 	private final Point start;
+	private final MusicPlayer musicPlayer;
 	private final RaceDrawing drawing;
-
-	// private long lastActionPerformed = 0;
 
 	public Racing(final Dimension dim) {
 		screenSize = dim;
@@ -40,38 +37,31 @@ public class Racing implements ActionListener {
 		final Timer timer = new Timer(7, this);
 		timer.start();
 
-		drawing = new RaceDrawing(raceCar, map, screenSize);
+		musicPlayer = new MusicPlayer();
+		musicPlayer.play();
+
+		drawing = new RaceDrawing(raceCar, map, screenSize, musicPlayer);
 		final Timer drawTimer = new Timer(20, drawing);
 		drawTimer.start();
 	}
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
-		// final long loopStartTime = System.nanoTime();
 		keyProcessing();
 
 		validatePosition();
 		raceCar.move();
 		map.moveTo(raceCar.getXCoordinate(), raceCar.getYCoordinate());
-
-		// repaint();
-		// System.out.print((System.nanoTime() - loopStartTime) / 1000000.0
-		// + " / ");
-		// System.out.println((System.currentTimeMillis() -
-		// lastActionPerformed));
-		// lastActionPerformed = System.currentTimeMillis();
 	}
 
 	private void validatePosition() {
 		if (!map.isOnMap(raceCar.getPoint())) {
-			// raceCar.stop();
 			raceCar.collide();
 			return;
 		}
 
 		// final int col = map.getRGBAtPoint(raceCar.getPoint());
-
-		// TODO Auto-generated method stub
+		// TODO collision handling
 	}
 
 	private void registerKeyListener() {

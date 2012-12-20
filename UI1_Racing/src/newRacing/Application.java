@@ -8,7 +8,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
-public class Application extends JFrame {
+public final class Application extends JFrame {
 
 	private static final long serialVersionUID = -1824092949935612488L;
 	private final GraphicsDevice device;
@@ -58,7 +58,6 @@ public class Application extends JFrame {
 		new Thread() {
 			@Override
 			public void run() {
-				setPriority(MAX_PRIORITY);
 				final Application window = new Application(defaultScreen, dim);
 				window.initComponents();
 				window.begin();

@@ -18,7 +18,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
-public class Map extends JComponent {
+public final class Map extends JComponent {
 
 	private static final long serialVersionUID = -4735738015518168941L;
 	private final String racingTrack;
@@ -26,7 +26,8 @@ public class Map extends JComponent {
 	private double x;
 	private double y;
 	private final Point startPoint;
-	private final Dimension screenSize;
+
+	private Graphics2D graphicsOrigin = null;
 
 	final int grassSize;
 	final int xTimesGrass;
@@ -44,7 +45,6 @@ public class Map extends JComponent {
 	public Map(final String trackName, final Point start, final Dimension scSize) {
 		System.out.println("selected map: " + trackName);
 		startPoint = start;
-		screenSize = scSize;
 		x = start.x;
 		y = start.y;
 
@@ -62,7 +62,7 @@ public class Map extends JComponent {
 					AffineTransformOp.TYPE_BILINEAR);
 			texture = scaleOp.filter(texture, null);
 
-			track = SVGLoader.getSVGImage("/tracks/" + racingTrack
+			track = ImageLoader.getSVGImage("/tracks/" + racingTrack
 					+ "/track.svg", texture.getWidth(), texture.getHeight());
 
 			track = createCompatibleImage(track, true);
@@ -101,6 +101,7 @@ public class Map extends JComponent {
 	@Override
 	protected void paintComponent(final Graphics g) {
 		final Graphics2D g2d = (Graphics2D) g;
+		graphicsOrigin = g2d;
 		g2d.translate(startPoint.x - x, startPoint.y - y);
 
 		for (int i = 0; i < xTimesGrass; i++) {
@@ -112,6 +113,10 @@ public class Map extends JComponent {
 
 		g2d.drawImage(track, 0, 0, null);
 		g2d.drawImage(texture, 0, 0, null);
+	}
+
+	public void revertGraphicsTranslate() {
+		graphicsOrigin.translate(-(startPoint.x - x), -(startPoint.y - y));
 	}
 
 	public int getRGBAtPoint(final Point p) {

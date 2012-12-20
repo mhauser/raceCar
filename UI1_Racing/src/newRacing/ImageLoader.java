@@ -2,7 +2,11 @@ package newRacing;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
+import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -12,7 +16,7 @@ import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGException;
 import com.kitfox.svg.SVGUniverse;
 
-public class SVGLoader {
+public class ImageLoader {
 
 	private final static AffineTransform scaleXform = new AffineTransform();
 	private final static boolean scaleToFit = true;
@@ -33,7 +37,7 @@ public class SVGLoader {
 				BufferedImage.TYPE_INT_ARGB);
 		try {
 			final SVGUniverse uni = new SVGUniverse();
-			final URI svgURI = uni.loadSVG(SVGLoader.class
+			final URI svgURI = uni.loadSVG(ImageLoader.class
 					.getResource(pathToSVGFile));
 			paintImage((Graphics2D) image.getGraphics(), new Dimension(width,
 					height), uni, svgURI);
@@ -41,7 +45,7 @@ public class SVGLoader {
 			e.printStackTrace();
 			return null;
 		}
-		return image;
+		return createCompatibleImage(image, true);
 	}
 
 	private static void paintImage(final Graphics2D g, final Dimension dim,
@@ -88,5 +92,23 @@ public class SVGLoader {
 		g.setTransform(oldXform);
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldAliasHint);
+	}
+
+	private static BufferedImage createCompatibleImage(final BufferedImage img,
+			final boolean translucent) {
+		final GraphicsEnvironment e = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		final GraphicsDevice d = e.getDefaultScreenDevice();
+		final GraphicsConfiguration c = d.getDefaultConfiguration();
+		final int t = translucent ? Transparency.TRANSLUCENT
+				: Transparency.BITMASK;
+
+		final BufferedImage ret = c.createCompatibleImage(img.getWidth(),
+				img.getHeight(), t);
+
+		final Graphics2D g = ret.createGraphics();
+		g.drawImage(img, 0, 0, null);
+		g.dispose();
+		return ret;
 	}
 }

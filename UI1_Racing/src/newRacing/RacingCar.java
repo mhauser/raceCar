@@ -56,6 +56,9 @@ public class RacingCar extends Car {
 
 		g2d.setPaint(new Color(0xBFD7FF));
 		g2d.fillPolygon(new int[] { 0, -10, 10 }, new int[] { -17, 5, 5 }, 3);
+
+		g2d.rotate(-angle);
+		g2d.translate(-x, -y);
 	}
 
 	// @Override
