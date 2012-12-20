@@ -37,7 +37,7 @@ public class Application extends JFrame {
 	}
 
 	private void initComponents() {
-		add(new Racing(dim));
+		add(new Racing(dim).getDrawing());
 	}
 
 	public static void main(final String[] args) throws Exception {

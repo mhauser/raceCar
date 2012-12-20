@@ -1,7 +1,7 @@
 package newRacing;
 
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -11,21 +11,20 @@ import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Racing extends JPanel implements ActionListener {
+public class Racing implements ActionListener {
 
 	private static final long serialVersionUID = -6136344536323335103L;
 
 	private int[] keys;
 	private final Car raceCar;
 	private final Map map;
-	private final Timer timer;
 	private final Dimension screenSize;
 	private final Point start;
+	private final RaceDrawing drawing;
 
-	private long lastActionPerformed = 0;
+	// private long lastActionPerformed = 0;
 
 	public Racing(final Dimension dim) {
 		screenSize = dim;
@@ -38,26 +37,29 @@ public class Racing extends JPanel implements ActionListener {
 
 		registerKeyListener();
 
-		setPreferredSize(screenSize);
-
-		timer = new Timer(15, this);
+		final Timer timer = new Timer(7, this);
 		timer.start();
+
+		drawing = new RaceDrawing(raceCar, map, screenSize);
+		final Timer drawTimer = new Timer(20, drawing);
+		drawTimer.start();
 	}
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
-		final long loopStartTime = System.nanoTime();
+		// final long loopStartTime = System.nanoTime();
 		keyProcessing();
 
 		validatePosition();
 		raceCar.move();
 		map.moveTo(raceCar.getXCoordinate(), raceCar.getYCoordinate());
 
-		repaint();
-		System.out.print((System.nanoTime() - loopStartTime) / 1000000.0
-				+ " / ");
-		System.out.println((System.currentTimeMillis() - lastActionPerformed));
-		lastActionPerformed = System.currentTimeMillis();
+		// repaint();
+		// System.out.print((System.nanoTime() - loopStartTime) / 1000000.0
+		// + " / ");
+		// System.out.println((System.currentTimeMillis() -
+		// lastActionPerformed));
+		// lastActionPerformed = System.currentTimeMillis();
 	}
 
 	private void validatePosition() {
@@ -67,17 +69,9 @@ public class Racing extends JPanel implements ActionListener {
 			return;
 		}
 
-		final int col = map.getRGBAtPoint(raceCar.getPoint());
+		// final int col = map.getRGBAtPoint(raceCar.getPoint());
 
 		// TODO Auto-generated method stub
-	}
-
-	@Override
-	protected void paintComponent(final Graphics g) {
-		super.paintComponent(g);
-
-		map.paintComponent(g);
-		raceCar.paintComponent(g);
 	}
 
 	private void registerKeyListener() {
@@ -108,7 +102,6 @@ public class Racing extends JPanel implements ActionListener {
 	private void keyProcessing() {
 
 		if (keys[KeyEvent.VK_ESCAPE] == 1) {
-			timer.stop();
 			System.exit(JFrame.EXIT_ON_CLOSE);
 		}
 		if (keys[KeyEvent.VK_UP] == 1) {
@@ -136,32 +129,8 @@ public class Racing extends JPanel implements ActionListener {
 			}
 		}
 	}
-}
 
-class MyTimer extends Thread {
-	private final ActionListener actionListener;
-	private final long delay;
-	private boolean running = false;
-
-	public MyTimer(final long d, final ActionListener al) {
-		actionListener = al;
-		running = true;
-		delay = d;
-	}
-
-	@Override
-	public void run() {
-		while (running) {
-			actionListener.actionPerformed(null);
-			try {
-				sleep(delay);
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void staahp() {
-		running = false;
+	public Component getDrawing() {
+		return drawing;
 	}
 }

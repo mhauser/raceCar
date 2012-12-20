@@ -12,7 +12,7 @@ public abstract class Car extends JComponent {
 	private static final float PI = (float) Math.PI;
 
 	protected float angle = 0;
-	protected double speed = 0.0;
+	protected double speed = 0;
 	protected float condition = 1;
 
 	protected double x = 0;
@@ -103,11 +103,24 @@ public abstract class Car extends JComponent {
 	}
 
 	public void turnRight() {
-		angle += PI / (40 / getAgility());
+		angle += deltaAngle(+1);
 	}
 
 	public void turnLeft() {
-		angle -= PI / (40 / getAgility());
+		angle += deltaAngle(-1);
+	}
+
+	private double deltaAngle(final int sign) {
+		double speedfactor = speed / getMaxForwardSpeed();
+		// between 0 and 1 for speed between 0 and getMaxForward
+
+		if (Math.abs(speedfactor) <= 0.08) {
+			return 0;
+		}
+
+		speedfactor = 0.5 * speedfactor + 0.5;
+
+		return (sign * 2 * PI) / (220.0 * speedfactor / getAgility());
 	}
 
 	public double getSpeed() {

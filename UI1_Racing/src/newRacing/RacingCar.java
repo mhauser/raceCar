@@ -5,21 +5,18 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 
 public class RacingCar extends Car {
 
 	private static final long serialVersionUID = 386056963794072270L;
-	private BufferedImage car = null;
 
 	public RacingCar(final Point start, final float angleInDeg) {
 		super(start, angleInDeg);
-		car = new BufferedImage(40, 40, BufferedImage.TRANSLUCENT);
 	}
 
 	@Override
 	public double getAcceleration() {
-		return 0.14;
+		return 0.035;
 	}
 
 	@Override
@@ -29,7 +26,7 @@ public class RacingCar extends Car {
 
 	@Override
 	public double getMaxForwardSpeed() {
-		return 10;
+		return 8;
 	}
 
 	@Override

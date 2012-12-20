@@ -37,7 +37,6 @@ public class Map extends JComponent {
 	private BufferedImage track;
 	private BufferedImage texture;
 	private BufferedImage[] checkpt;
-	// private BufferedImage wall;
 	private BufferedImage grass;
 
 	private int checkpointsCount;
@@ -52,26 +51,19 @@ public class Map extends JComponent {
 		racingTrack = trackName;
 
 		try {
-			// track = ImageIO.read(new File("data/tracks/" + racingTrack
-			// + "/track.png"));
 			texture = ImageIO.read(new File("data/tracks/" + racingTrack
 					+ "/texture.png"));
-			// wall = ImageIO.read(new File("data/tracks/" + racingTrack
-			// + "/wall.png"));
 			grass = ImageIO.read(new File("data/grass.jpg"));
 
-			track = SVGLoader.getSVGImage("/tracks/" + racingTrack
-					+ "/track.svg", texture.getWidth(), texture.getHeight());
-
-			final AffineTransform at = new AffineTransform();
 			final double scaleFactor = 1.7;
+			final AffineTransform at = new AffineTransform();
 			at.scale(scaleFactor, scaleFactor);
 			final AffineTransformOp scaleOp = new AffineTransformOp(at,
 					AffineTransformOp.TYPE_BILINEAR);
-
-			track = scaleOp.filter(track, null);
 			texture = scaleOp.filter(texture, null);
-			// wall = scaleOp.filter(wall, null);
+
+			track = SVGLoader.getSVGImage("/tracks/" + racingTrack
+					+ "/track.svg", texture.getWidth(), texture.getHeight());
 
 			track = createCompatibleImage(track, true);
 			texture = createCompatibleImage(texture, true);
@@ -118,7 +110,6 @@ public class Map extends JComponent {
 			}
 		}
 
-		// g2d.drawImage(wall, 0, 0, screenSize.width, screenSize.height, null);
 		g2d.drawImage(track, 0, 0, null);
 		g2d.drawImage(texture, 0, 0, null);
 	}
