@@ -4,7 +4,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -33,7 +37,7 @@ public class Map extends JComponent {
 	private BufferedImage track;
 	private BufferedImage texture;
 	private BufferedImage[] checkpt;
-	private BufferedImage wall;
+	// private BufferedImage wall;
 	private BufferedImage grass;
 
 	private int checkpointsCount;
@@ -48,16 +52,16 @@ public class Map extends JComponent {
 		racingTrack = trackName;
 
 		try {
-			track = ImageIO.read(new File("data/tracks/" + racingTrack
-					+ "/track.png"));
+			// track = ImageIO.read(new File("data/tracks/" + racingTrack
+			// + "/track.png"));
 			texture = ImageIO.read(new File("data/tracks/" + racingTrack
 					+ "/texture.png"));
-			wall = ImageIO.read(new File("data/tracks/" + racingTrack
-					+ "/wall.png"));
+			// wall = ImageIO.read(new File("data/tracks/" + racingTrack
+			// + "/wall.png"));
 			grass = ImageIO.read(new File("data/grass.jpg"));
 
-			// track = SVGLoader.getSVGImage("/tracks/" + racingTrack
-			// + "/track.svg", texture.getWidth(), texture.getHeight());
+			track = SVGLoader.getSVGImage("/tracks/" + racingTrack
+					+ "/track.svg", texture.getWidth(), texture.getHeight());
 
 			final AffineTransform at = new AffineTransform();
 			final double scaleFactor = 1.7;
@@ -67,11 +71,10 @@ public class Map extends JComponent {
 
 			track = scaleOp.filter(track, null);
 			texture = scaleOp.filter(texture, null);
-			wall = scaleOp.filter(wall, null);
+			// wall = scaleOp.filter(wall, null);
 
-			track.flush();
-			texture.flush();
-			wall.flush();
+			track = createCompatibleImage(track, true);
+			texture = createCompatibleImage(texture, true);
 
 		} catch (final IOException e) {
 			e.printStackTrace();
@@ -115,7 +118,7 @@ public class Map extends JComponent {
 			}
 		}
 
-		g2d.drawImage(wall, 0, 0, null);
+		// g2d.drawImage(wall, 0, 0, screenSize.width, screenSize.height, null);
 		g2d.drawImage(track, 0, 0, null);
 		g2d.drawImage(texture, 0, 0, null);
 	}
@@ -141,5 +144,23 @@ public class Map extends JComponent {
 	public void moveTo(final double xCoordinate, final double yCoordinate) {
 		x = xCoordinate;
 		y = yCoordinate;
+	}
+
+	private static BufferedImage createCompatibleImage(final BufferedImage img,
+			final boolean translucent) {
+		final GraphicsEnvironment e = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		final GraphicsDevice d = e.getDefaultScreenDevice();
+		final GraphicsConfiguration c = d.getDefaultConfiguration();
+		final int t = translucent ? Transparency.TRANSLUCENT
+				: Transparency.BITMASK;
+
+		final BufferedImage ret = c.createCompatibleImage(img.getWidth(),
+				img.getHeight(), t);
+
+		final Graphics2D g = ret.createGraphics();
+		g.drawImage(img, 0, 0, null);
+		g.dispose();
+		return ret;
 	}
 }
