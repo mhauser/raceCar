@@ -93,7 +93,7 @@ public final class RaceDrawing extends JPanel implements ActionListener {
 		raceCar.paintComponent(g);
 		map.revertGraphicsTranslate();
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = musicPlayer.isMutable() ? 0 : 1; i < 4; i++) {
 			g.drawImage(buttonIcons[i], buttons[i].x, buttons[i].y, null);
 		}
 	}

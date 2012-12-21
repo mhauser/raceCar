@@ -73,6 +73,10 @@ public class Racing implements ActionListener {
 		kfm.addKeyEventDispatcher(new KeyEventDispatcher() {
 			@Override
 			public boolean dispatchKeyEvent(final KeyEvent e) {
+				if (e.getKeyCode() >= keys.length) {
+					return false;
+				}
+
 				switch (e.getID()) {
 				case KeyEvent.KEY_PRESSED:
 					keys[e.getKeyCode()] = 1;

@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.BooleanControl;
+import javax.sound.sampled.BooleanControl.Type;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -13,8 +15,11 @@ public class MusicPlayer {
 
 	private boolean paused = false;
 	private boolean muted = false;
+	private boolean mutable = true;
 	private Clip clip;
 	private int framePosition = 0;
+
+	private BooleanControl muteControl = null;
 
 	public MusicPlayer() {
 		try {
@@ -22,9 +27,12 @@ public class MusicPlayer {
 					.getAudioInputStream(new File("data/audio/racing_0.wav"));
 			clip = AudioSystem.getClip();
 			clip.open(audioIn);
+			muteControl = (BooleanControl) clip.getControl(Type.MUTE);
 		} catch (UnsupportedAudioFileException | IOException
 				| LineUnavailableException e) {
 			e.printStackTrace();
+		} catch (final IllegalArgumentException e) {
+			mutable = false;
 		}
 		play();
 	}
@@ -35,17 +43,18 @@ public class MusicPlayer {
 	 * @param mute
 	 */
 	public void mute(final boolean mute) {
-		// TODO find solution for real mute?!
-		if (mute) {
-			pause();
-		} else {
-			play();
+		if (muteControl != null) {
+			muteControl.setValue(mute);
 		}
 		muted = mute;
 	}
 
 	public boolean isMuted() {
 		return muted;
+	}
+
+	public boolean isMutable() {
+		return mutable;
 	}
 
 	public void previous() {
