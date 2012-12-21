@@ -29,9 +29,9 @@ public final class RaceDrawing extends JPanel implements ActionListener {
 	private final Dimension screenSize;
 	private final MusicPlayer musicPlayer;
 
-	private final Rectangle[] buttons;
-	private final BufferedImage[] buttonIcons;
-	private final Rectangle buttonArea;
+	private Rectangle[] buttons;
+	private BufferedImage[] buttonIcons;
+	private Rectangle buttonArea;
 
 	private BufferedImage bi_mute;
 	private BufferedImage bi_noMute;
@@ -47,13 +47,14 @@ public final class RaceDrawing extends JPanel implements ActionListener {
 		screenSize = dim;
 		musicPlayer = mp;
 
-		buttonIcons = new BufferedImage[4];
-		buttons = new Rectangle[4];
-		buttonArea = new Rectangle(initButtons());
-
+		if (musicPlayer.isMusicAvailable()) {
+			buttonIcons = new BufferedImage[4];
+			buttons = new Rectangle[4];
+			buttonArea = new Rectangle(initButtons());
+			addMouseListener(new DrawingActionListener());
+		}
 		setPreferredSize(screenSize);
 
-		addMouseListener(new DrawingActionListener());
 	}
 
 	private Rectangle initButtons() {
@@ -93,8 +94,10 @@ public final class RaceDrawing extends JPanel implements ActionListener {
 		raceCar.paintComponent(g);
 		map.revertGraphicsTranslate();
 
-		for (int i = musicPlayer.isMutable() ? 0 : 1; i < 4; i++) {
-			g.drawImage(buttonIcons[i], buttons[i].x, buttons[i].y, null);
+		if (musicPlayer.isMusicAvailable()) {
+			for (int i = musicPlayer.isMutable() ? 0 : 1; i < 4; i++) {
+				g.drawImage(buttonIcons[i], buttons[i].x, buttons[i].y, null);
+			}
 		}
 	}
 

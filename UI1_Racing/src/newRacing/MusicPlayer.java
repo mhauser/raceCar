@@ -2,12 +2,16 @@ package newRacing;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.BooleanControl;
 import javax.sound.sampled.BooleanControl.Type;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -17,34 +21,68 @@ public class MusicPlayer {
 	private boolean muted = false;
 	private boolean mutable = true;
 	private Clip clip;
+	private List<File> tracks;
+	private int trackIndex = 0;
 	private int framePosition = 0;
 
 	private BooleanControl muteControl = null;
+	private FloatControl gainControl = null;
 
 	public MusicPlayer() {
 		try {
-			final AudioInputStream audioIn = AudioSystem
-					.getAudioInputStream(new File("data/audio/racing_0.wav"));
 			clip = AudioSystem.getClip();
-			clip.open(audioIn);
-			muteControl = (BooleanControl) clip.getControl(Type.MUTE);
-		} catch (UnsupportedAudioFileException | IOException
-				| LineUnavailableException e) {
+			initTracks();
+			if (isMusicAvailable())
+				next();
+		} catch (final LineUnavailableException e) {
 			e.printStackTrace();
-		} catch (final IllegalArgumentException e) {
-			mutable = false;
 		}
-		play();
 	}
 
-	/**
-	 * Until now equivalent to pause() respectively play()
-	 * 
-	 * @param mute
-	 */
+	private void initTracks() {
+		tracks = new ArrayList<>();
+		final File tracksDir = new File("data/audio");
+		if (!tracksDir.exists() || !tracksDir.isDirectory()) {
+			return;
+		}
+
+		for (final File f : tracksDir.listFiles()) {
+			if (f.isDirectory()) {
+				continue;
+			}
+			try {
+				final AudioFileFormat aff = AudioSystem.getAudioFileFormat(f);
+				if (AudioSystem.isFileTypeSupported(aff.getType())) {
+					tracks.add(f);
+				}
+			} catch (UnsupportedAudioFileException | IOException e) {
+				continue;
+			}
+
+		}
+
+	}
+
+	private void setMuteControls() {
+		if (clip.isControlSupported(BooleanControl.Type.MUTE)) {
+			muteControl = (BooleanControl) clip.getControl(Type.MUTE);
+		} else if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+			gainControl = (FloatControl) clip
+					.getControl(FloatControl.Type.MASTER_GAIN);
+		} else if (clip.isControlSupported(FloatControl.Type.VOLUME)) {
+			gainControl = (FloatControl) clip
+					.getControl(FloatControl.Type.VOLUME);
+		} else {
+			mutable = false;
+		}
+	}
+
 	public void mute(final boolean mute) {
 		if (muteControl != null) {
 			muteControl.setValue(mute);
+		} else if (gainControl != null) {
+			gainControl.setValue(mute ? gainControl.getMinimum() : gainControl
+					.getMaximum());
 		}
 		muted = mute;
 	}
@@ -57,12 +95,45 @@ public class MusicPlayer {
 		return mutable;
 	}
 
+	public boolean isMusicAvailable() {
+		return tracks.size() > 0;
+	}
+
 	public void previous() {
-		// TODO
+		next(-1);
 	}
 
 	public void next() {
-		// TODO
+		next(1);
+	}
+
+	private void next(final int offset) {
+		assert tracks != null && tracks.size() > 0;
+
+		trackIndex += offset;
+		if (trackIndex < 0) {
+			trackIndex = tracks.size() - 1;
+		}
+
+		final boolean initiallyPaused = paused;
+		pause();
+		try {
+			// TODO chose right file
+			if (clip.isOpen()) {
+				clip.close();
+			}
+			final AudioInputStream audioIn = AudioSystem
+					.getAudioInputStream(tracks.get(trackIndex % tracks.size()));
+			clip.open(audioIn);
+			setMuteControls();
+		} catch (UnsupportedAudioFileException | IOException
+				| LineUnavailableException e) {
+			e.printStackTrace();
+		}
+		framePosition = 0;
+		if (!initiallyPaused) {
+			play();
+		}
 	}
 
 	public void pause() {
@@ -71,7 +142,6 @@ public class MusicPlayer {
 			clip.stop();
 		}
 		framePosition = clip.getFramePosition();
-		// TODO
 	}
 
 	public void play() {
