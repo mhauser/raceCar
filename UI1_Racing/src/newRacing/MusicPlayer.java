@@ -15,6 +15,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.JOptionPane;
 
 public class MusicPlayer {
 
@@ -33,8 +34,15 @@ public class MusicPlayer {
 		try {
 			clip = AudioSystem.getClip();
 			initTracks();
-			if (isMusicAvailable())
+			if (isMusicAvailable()) {
 				next();
+			} else {
+				JOptionPane.showOptionDialog(null,
+						"No supported music file in directory /data/audio",
+						"Racing", JOptionPane.OK_OPTION,
+						JOptionPane.PLAIN_MESSAGE, null, new Object[] { "Ok" },
+						"Ok");
+			}
 		} catch (final LineUnavailableException e) {
 			e.printStackTrace();
 		}
