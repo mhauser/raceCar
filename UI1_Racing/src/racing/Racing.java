@@ -31,7 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-public class Racing extends JPanel implements ActionListener {
+public final class Racing extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1169331112688629681L;
 
@@ -97,7 +97,7 @@ public class Racing extends JPanel implements ActionListener {
 		setPreferredSize(screenSize);
 
 		raceCar = new RacingCar();
-		raceCar.move(1370, 400);
+		raceCar.move(400, 300);
 		raceCar.setAngle((float) (0.838734 * 2 * Math.PI));
 
 		loadCheckPoints();
@@ -153,8 +153,8 @@ public class Racing extends JPanel implements ActionListener {
 
 	@Override
 	public void paintComponent(final Graphics g) {
-		final Graphics2D g2d = (Graphics2D) g;
 		super.paintComponent(g);
+		final Graphics2D g2d = (Graphics2D) g;
 
 		g2d.drawImage(grass, 0, 0, null);
 		g2d.drawImage(wall, 0, 0, null);
@@ -178,6 +178,7 @@ public class Racing extends JPanel implements ActionListener {
 						stringX, 35 + (i + 1) * 20);
 			}
 		}
+
 		raceCar.paintComponent(g2d);
 	}
 

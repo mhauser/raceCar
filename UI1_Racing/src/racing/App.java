@@ -27,13 +27,10 @@ public class App {
 	private JComboBox<String> comboBox_1;
 
 	/**
-	 * Launch the application.
-	 * 
-	 * @throws UnsupportedLookAndFeelException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws ClassNotFoundException
+	 * this main method is deprecated. use newRacing/Application.main instead.
+	 * have fun =)
 	 */
+	@Deprecated
 	public static void main(final String[] args) throws ClassNotFoundException,
 			InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException {
