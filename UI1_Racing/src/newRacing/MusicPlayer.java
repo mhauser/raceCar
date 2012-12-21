@@ -3,6 +3,7 @@ package newRacing;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -58,9 +59,8 @@ public class MusicPlayer {
 			} catch (UnsupportedAudioFileException | IOException e) {
 				continue;
 			}
-
 		}
-
+		Collections.shuffle(tracks);
 	}
 
 	private void setMuteControls() {
@@ -113,17 +113,19 @@ public class MusicPlayer {
 		trackIndex += offset;
 		if (trackIndex < 0) {
 			trackIndex = tracks.size() - 1;
+		} else if (trackIndex >= tracks.size()) {
+			trackIndex = 0;
+			Collections.shuffle(tracks);
 		}
 
 		final boolean initiallyPaused = paused;
 		pause();
 		try {
-			// TODO chose right file
 			if (clip.isOpen()) {
 				clip.close();
 			}
 			final AudioInputStream audioIn = AudioSystem
-					.getAudioInputStream(tracks.get(trackIndex % tracks.size()));
+					.getAudioInputStream(tracks.get(trackIndex));
 			clip.open(audioIn);
 			setMuteControls();
 		} catch (UnsupportedAudioFileException | IOException
