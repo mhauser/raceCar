@@ -13,11 +13,13 @@ import javax.sound.sampled.BooleanControl;
 import javax.sound.sampled.BooleanControl.Type;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JOptionPane;
 
-public class MusicPlayer {
+public class MusicPlayer implements LineListener {
 
 	private boolean paused = false;
 	private boolean muted = false;
@@ -118,6 +120,7 @@ public class MusicPlayer {
 	private void next(final int offset) {
 		assert tracks != null && tracks.size() > 0;
 
+		clip.removeLineListener(this);
 		trackIndex += offset;
 		if (trackIndex < 0) {
 			trackIndex = tracks.size() - 1;
@@ -141,6 +144,7 @@ public class MusicPlayer {
 			e.printStackTrace();
 		}
 		framePosition = 0;
+		clip.addLineListener(this);
 		if (!initiallyPaused) {
 			play();
 		}
@@ -160,16 +164,23 @@ public class MusicPlayer {
 			clip.stop();
 		}
 		clip.setFramePosition(framePosition);
-		clip.loop(Clip.LOOP_CONTINUOUSLY);
+		clip.loop(0);
 	}
 
 	public boolean isPaused() {
 		return paused;
 	}
 
-	public void checkpointSignal() {
+	public void playGameSound() {
 		pause();
 		// TODO
 		play();
+	}
+
+	@Override
+	public void update(final LineEvent event) {
+		if (LineEvent.Type.STOP.equals(event.getType())) {
+			next();
+		}
 	}
 }
